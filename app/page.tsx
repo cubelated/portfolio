@@ -9,16 +9,14 @@ import {
   Github,
   Globe2,
   HeartHandshake,
-  Layers3,
   Linkedin,
   Mail,
   MapPin,
   Music2,
   Play,
-  ServerCog,
   Smartphone,
   Sparkles,
-  Zap,
+  Youtube,
 } from "lucide-react";
 
 const projects = [
@@ -57,7 +55,7 @@ const projects = [
     description:
       "An embodied learning experience that helps students understand abstract algorithms through movement and interaction.",
     impact: "Research translated into an interactive learning tool",
-    stack: ["Flutter", "Python", "Computer Vision", "EdTech"],
+    stack: ["Flutter", "Firebase", "Embodied cognition", "Situational learning"],
     href: "https://www.youtube.com/watch?v=ATqbLGN2ZBk&list=PLM97qnUGt3wg2bZ5MLHqysTbSy3SXrm1i",
     linkLabel: "Watch project",
     mediaType: "video",
@@ -71,7 +69,7 @@ const projects = [
     description:
       "A collaborative virtual classroom designed to make remote learning more engaging and natural for students and educators.",
     impact: "Excellence Award · Built by a four-person team",
-    stack: ["Full stack", "Real-time", "Collaboration", "EdTech"],
+    stack: ["Flutter", "Firebase", "Classroom assistant", "English learning"],
     href: "https://youtu.be/DH1pCYupwNM?si=Ty1wVrY7K6U-fRbY",
     linkLabel: "Watch project",
     mediaType: "video",
@@ -190,6 +188,7 @@ export default function Home() {
       "https://www.linkedin.com/in/hanssen-budisantoso-wijaya/",
       "https://github.com/cubelated",
       "https://www.tiktok.com/@hanssenbudi",
+      "https://youtube.com/@hanssenbudi",
     ],
     alumniOf: {
       "@type": "CollegeOrUniversity",
@@ -205,9 +204,9 @@ export default function Home() {
       <a className="skip-link" href="#projects">Skip to projects</a>
 
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Hanssen — home">
+        <a className="brand" href="#top" aria-label="Cubelated — home">
           <span className="brand-mark" aria-hidden="true"><Code2 size={17} /></span>
-          <span>Hanssen.</span>
+          <span>Cubelated.</span>
         </a>
         <nav className="site-nav" aria-label="Primary navigation">
           <a href="#projects">Projects</a>
@@ -223,7 +222,7 @@ export default function Home() {
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
           <p className="eyebrow"><MapPin size={14} /> Full-Stack Software Engineer · Taichung</p>
-          <h1 id="hero-title">Building to<br /><em>Impact Lives.</em></h1>
+          <h1 id="hero-title">Welcome to<br /><em>Cubelated.</em></h1>
           <p className="hero-lede">
             Hi, I&apos;m Hanssen—also known as <strong>@cubelated</strong>. I identify real-life
             problems, design focused solutions, and build dependable systems that make
@@ -246,17 +245,10 @@ export default function Home() {
         </aside>
       </section>
 
-      <div className="capability-strip" aria-label="Areas of expertise">
-        <span><Layers3 size={15} /> Product engineering</span>
-        <span><Smartphone size={15} /> Mobile applications</span>
-        <span><ServerCog size={15} /> Full-stack systems</span>
-        <span><Zap size={15} /> Infrastructure automation</span>
-      </div>
-
       <section className="mission section-shell" aria-labelledby="mission-title">
         <p className="section-index"><Sparkles size={15} /> Mission</p>
         <div className="mission-copy">
-          <h2 id="mission-title">Software should leave life<br /><em>better than it found it.</em></h2>
+          <h2 id="mission-title">Building to<br /><em>Impact Lives.</em></h2>
           <div className="mission-detail">
             <p>
               I enjoy building software that improves productivity, helps people in their
@@ -264,7 +256,8 @@ export default function Home() {
             </p>
             <p>
               Inspired by Christ&apos;s self-giving love, I want my work to serve people,
-              strengthen society, and remain grounded in truth.
+              strengthen society, and help individuals discover and pursue their own
+              particular purpose in life—all while remaining grounded in truth.
             </p>
           </div>
         </div>
@@ -274,9 +267,9 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <p className="eyebrow"><BriefcaseBusiness size={14} /> Projects</p>
-            <h2 id="projects-title">Useful ideas,<br />built all the way through.</h2>
+            <h2 id="projects-title">From Ideas to<br />impacting lives.</h2>
           </div>
-          <p>Four projects across product, IoT, and education—each shaped around a real human need, not just a technical exercise.</p>
+          <p>Projects across product, IoT, and education—each shaped around a real human need, not just a technical exercise.</p>
         </div>
 
         <div className="project-grid">
@@ -371,13 +364,14 @@ export default function Home() {
             <a href="https://www.linkedin.com/in/hanssen-budisantoso-wijaya/" target="_blank" rel="noreferrer"><Linkedin size={17} /> LinkedIn <ArrowUpRight size={14} /></a>
             <a href="https://github.com/cubelated" target="_blank" rel="noreferrer"><Github size={17} /> GitHub <ArrowUpRight size={14} /></a>
             <a href="https://www.tiktok.com/@hanssenbudi" target="_blank" rel="noreferrer"><Music2 size={17} /> TikTok <ArrowUpRight size={14} /></a>
+            <a href="https://youtube.com/@hanssenbudi" target="_blank" rel="noreferrer"><Youtube size={17} /> YouTube <ArrowUpRight size={14} /></a>
           </div>
         </div>
       </section>
 
       <footer className="site-footer">
         <div className="section-shell">
-          <a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark"><Code2 size={17} /></span><span>Hanssen.</span></a>
+          <a className="brand" href="#top" aria-label="Back to top"><span className="brand-mark"><Code2 size={17} /></span><span>Cubelated.</span></a>
           <p>Building to Impact Lives.</p>
           <p>© {new Date().getFullYear()} Hanssen Budisantoso Wijaya</p>
         </div>
