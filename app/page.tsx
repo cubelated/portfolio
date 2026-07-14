@@ -27,10 +27,10 @@ const projects = [
       "A life-admin tracker that helps people stay ahead of expiring documents, warranties, subscriptions, and recurring responsibilities.",
     impact: "Designed and built end to end for Android",
     stack: ["Flutter", "Supabase", "Firebase", "RevenueCat"],
-    href: "https://renewables.cubelated.com/",
+    href: "https://renewables.cubelated.com",
     linkLabel: "Visit product",
     mediaType: "website",
-    media: "https://renewables.cubelated.com/",
+    media: "https://renewables.cubelated.com",
     icon: Globe2,
   },
   {
