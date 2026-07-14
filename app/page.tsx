@@ -221,7 +221,7 @@ export default function Home() {
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
           <p className="eyebrow"><Code2 size={14} /> Full-Stack Software Engineer</p>
-          <h1 id="hero-title">Welcome to my<br /><em>portfolio!</em></h1>
+          <h1 id="hero-title">Build with<br /><em>Purpose.</em></h1>
           <p className="hero-lede">
             Hi, I&apos;m Hanssen—also known as <strong>@cubelated</strong>. I identify real-life
             problems, design focused solutions, and build dependable systems that make
