@@ -8,8 +8,8 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL("https://cubelated.com"),
   title: {
-    default: "Hanssen Budisantoso Wijaya | Software Engineer",
-    template: "%s | Hanssen Budisantoso Wijaya",
+    default: "Cubelated | Hanssen Budisantoso Wijaya",
+    template: "%s | Cubelated",
   },
   description:
     "Portfolio of Hanssen Budisantoso Wijaya, a software engineer in Taichung building impactful mobile apps, full-stack products, and infrastructure platforms.",
@@ -24,15 +24,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Hanssen Budisantoso Wijaya", url: "https://github.com/cubelated" }],
   creator: "Hanssen Budisantoso Wijaya",
-  publisher: "Hanssen Budisantoso Wijaya",
+  publisher: "Cubelated",
   category: "technology",
   alternates: { canonical: "https://cubelated.com/" },
   openGraph: {
     type: "profile",
     locale: "en_US",
-    title: "Hanssen Budisantoso Wijaya | Building to Impact Lives",
+    title: "Cubelated | Building to Impact Lives",
     description: "Software engineer building dependable products that make complex work feel simple.",
-    siteName: "Hanssen Budisantoso Wijaya",
+    siteName: "Cubelated",
     url: "https://cubelated.com/",
     images: [{ url: "/hanssen-profile.jpg", width: 683, height: 721, alt: "Hanssen Budisantoso Wijaya" }],
     firstName: "Hanssen",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hanssen Budisantoso Wijaya | Building to Impact Lives",
+    title: "Cubelated | Building to Impact Lives",
     description: "Software engineer building dependable products that make complex work feel simple.",
     images: ["/hanssen-profile.jpg"],
   },
