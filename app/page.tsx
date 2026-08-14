@@ -160,7 +160,11 @@ function PixelCharacter({
 }) {
   const facing = direction === -1 ? "south-west" : "south-east";
   const sprite =
-    mode === "idle" ? "/knight/idle-south.png" : `/knight/${mode}-${facing}.png`;
+    mode === "idle"
+      ? "/knight/idle-breathing-south.gif"
+      : mode === "walk"
+        ? `/knight/walking-${facing}.gif`
+        : `/knight/dash-${facing}.png`;
 
   return (
     <div
@@ -174,19 +178,11 @@ function PixelCharacter({
       <div className="knight-shadow" />
       <div className="knight-sprite-wrap">
         <img
-          className="knight-sprite knight-sprite-primary"
+          className="knight-sprite"
           src={sprite}
           alt=""
           draggable="false"
         />
-        {mode === "walk" && (
-          <img
-            className="knight-sprite knight-sprite-alternate"
-            src={`/knight/walk-alt-${facing}.png`}
-            alt=""
-            draggable="false"
-          />
-        )}
       </div>
       <div className="dust dust-one" />
       <div className="dust dust-two" />
