@@ -14,7 +14,7 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const localBindingConfig = {
   name: "cubelated-portfolio",
   main: "./worker/index.ts",
-  compatibility_date: "2026-07-14",
+    compatibility_date: "2026-05-22",
   compatibility_flags: ["nodejs_compat"],
   routes: [
     { pattern: "cubelated.com", custom_domain: true },

@@ -8,11 +8,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL("https://cubelated.com"),
   title: {
-    default: "Cubelated | Hanssen Budisantoso Wijaya",
+    default: "Cubelated | Interactive Pixel Portfolio",
     template: "%s | Cubelated",
   },
   description:
-    "Portfolio of Hanssen Budisantoso Wijaya, a software engineer in Taichung building impactful mobile apps, full-stack products, and infrastructure platforms.",
+    "Explore the interactive pixel portfolio of Hanssen Budisantoso Wijaya, a mobile and full-stack software engineer building products with purpose.",
   keywords: [
     "Hanssen Budisantoso Wijaya",
     "黃晟旺",
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "profile",
     locale: "en_US",
-    title: "Cubelated | Building to Impact Lives",
-    description: "Software engineer building dependable products that make complex work feel simple.",
+    title: "Cubelated | Interactive Pixel Portfolio",
+    description: "Walk through the products, experience, and mission of software engineer Hanssen Budisantoso Wijaya.",
     siteName: "Cubelated",
     url: "https://cubelated.com/",
     images: [{ url: "/hanssen-profile.jpg", width: 683, height: 721, alt: "Hanssen Budisantoso Wijaya" }],
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cubelated | Building to Impact Lives",
-    description: "Software engineer building dependable products that make complex work feel simple.",
+    title: "Cubelated | Interactive Pixel Portfolio",
+    description: "A playable portfolio about building software with purpose.",
     images: ["/hanssen-profile.jpg"],
   },
   robots: {
@@ -51,18 +51,15 @@ export const metadata: Metadata = {
   },
   other: { "codex-preview": "development" },
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/favicon.svg",
-    apple: "/hanssen-profile.jpg",
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f5fa" },
-    { media: "(prefers-color-scheme: dark)", color: "#220b36" },
-  ],
-  colorScheme: "light",
+  themeColor: "#15121c",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
