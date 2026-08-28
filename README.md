@@ -1,8 +1,12 @@
 # Cubelated Portfolio
 
 The source for [cubelated.com](https://cubelated.com), the personal portfolio of
-Hanssen Budisantoso Wijaya — a full-stack software engineer building purposeful
-software under the mission **Building to Impact Lives**.
+Hanssen Budisantoso Wijaya — a software engineer building purposeful mobile
+products and distributed systems under the mission **Building to Impact Lives**.
+
+Visitors can choose between the playable pixel journey and a conventional quick
+view with selected case studies, evidence-backed expertise, professional impact,
+engineering decision notes, and current work.
 
 ## Stack
 

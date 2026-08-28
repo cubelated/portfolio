@@ -4,10 +4,17 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  CheckCircle2,
+  Code2,
+  Database,
   Github,
+  Globe2,
+  Layers3,
   Linkedin,
   Mail,
-  Play,
+  ShieldCheck,
+  Smartphone,
+  Users,
 } from "lucide-react";
 import {
   useCallback,
@@ -24,6 +31,7 @@ import {
 type TravelDirection = -1 | 1;
 type MotionMode = "idle" | "walk" | "dash";
 type ScenePhase = "hidden" | "entering" | "visible" | "exiting";
+type ViewMode = "explore" | "quick";
 
 type FloorTheme = {
   edge: string;
@@ -39,9 +47,15 @@ type Project = {
   description: string;
   impact: string;
   stack: string[];
-  href: string;
-  linkLabel: string;
-  action: "visit" | "github" | "watch";
+  status: string;
+  role: string;
+  problem: string;
+  decisions: string[];
+  outcome: string;
+  proof: string[];
+  externalHref?: string;
+  externalLabel?: string;
+  externalAction?: "visit" | "github";
   accent: string;
   sceneClass: string;
 };
@@ -49,57 +63,99 @@ type Project = {
 const projects: Project[] = [
   {
     number: "01",
-    eyebrow: "Independent product",
+    eyebrow: "Independent product · shipped",
     title: "Renewables",
     description:
       "A life-admin tracker that keeps passports, warranties, subscriptions, and recurring responsibilities from slipping through the cracks.",
-    impact: "Designed and shipped end to end for Android",
-    stack: ["Flutter", "Supabase", "Firebase", "RevenueCat"],
-    href: "https://renewables.cubelated.com",
-    linkLabel: "Visit product",
-    action: "visit",
+    impact: "Production Flutter product · mobile, web, widgets, and reminders",
+    stack: ["Flutter", "Riverpod", "Supabase", "RevenueCat"],
+    status: "Shipped product",
+    role: "Product design, Flutter engineering, backend integration, and release delivery",
+    problem:
+      "Important expirations are easy to forget because people only think about them when the document or subscription is already needed.",
+    decisions: [
+      "Kept the database as the canonical record while coordinating local and server notifications.",
+      "Separated domain guards from UI state so plan limits and reminders stay consistent across platforms.",
+      "Used deep links and home-screen widgets to shorten the path from an urgent reminder to action.",
+    ],
+    outcome:
+      "Designed and shipped the complete product across Android and web workflows, including subscriptions, recurring renewals, attachments, localization, and device widgets.",
+    proof: ["Cross-device change notifications", "Android and iOS widgets", "Timezone-aware reminders"],
+    externalHref: "https://renewables.cubelated.com",
+    externalLabel: "Visit product",
+    externalAction: "visit",
     accent: "#f47b43",
     sceneClass: "scene-renewables",
   },
   {
     number: "02",
-    eyebrow: "IoT + mobile",
-    title: "Flyfitnity",
+    eyebrow: "Current quest · privacy-first mobile",
+    title: "Selah",
     description:
-      "A Raspberry Pi and Flutter fitness system that turns physical movement into real-time mobile feedback over Bluetooth.",
-    impact: "Honorable Award · edge-to-mobile integration",
-    stack: ["Flutter", "Raspberry Pi", "Bluetooth", "IoT"],
-    href: "https://github.com/cubelated/flyfitnity_bluetooth_connection",
-    linkLabel: "View repository",
-    action: "github",
+      "A quiet-time companion that guides people to pause, put the phone down, read a physical Bible, reflect, pray, and gradually need the app less.",
+    impact: "Active development · encrypted, local-first, and intentionally private",
+    stack: ["Flutter", "Drift", "Encrypted SQLite", "Riverpod"],
+    status: "Active development",
+    role: "Product strategy, interaction design, mobile architecture, privacy model, and implementation",
+    problem:
+      "Most devotional products compete for engagement. Selah needs to provide structure without replacing Scripture, prayer, or a sustainable offline habit.",
+    decisions: [
+      "Removed accounts, analytics, ads, social feeds, and spiritual scores from the product model.",
+      "Encrypted the local Drift database and kept the key in platform secure storage.",
+      "Designed a 40-day journey with fading guidance so successful use reduces dependence on the app.",
+    ],
+    outcome:
+      "Built resumable guided sessions, a private journal, timezone-aware reminders, device authentication, and encrypted export and restore paths.",
+    proof: ["AES-256-GCM export", "Secure local journal", "Android, iOS, and web architecture"],
     accent: "#72d6b1",
     sceneClass: "scene-flyfitnity",
   },
   {
     number: "03",
-    eyebrow: "Master's research",
-    title: "LearnAlgo",
+    eyebrow: "Full-stack coordination system",
+    title: "IFGF Planner",
     description:
-      "An embodied learning experience that helps students understand abstract algorithms through movement, interaction, and situational learning.",
-    impact: "Research translated into an interactive tool",
-    stack: ["Flutter", "Firebase", "Embodied cognition", "Situational learning"],
-    href: "https://www.youtube.com/watch?v=ATqbLGN2ZBk&list=PLM97qnUGt3wg2bZ5MLHqysTbSy3SXrm1i",
-    linkLabel: "Watch project",
-    action: "watch",
+      "An Indonesian-first volunteer scheduling system for church coordinators, with availability collection, guarded assignments, and LINE group delivery.",
+    impact: "End-to-end workflow · scheduling, security, export, and group messaging",
+    stack: ["Next.js", "Supabase", "LINE API", "Cloudflare"],
+    status: "Active product",
+    role: "Workflow design, full-stack development, database security, integrations, and deployment",
+    problem:
+      "Coordinators were reconciling recurring services, volunteer eligibility, unavailability, schedules, and group reminders across disconnected manual steps.",
+    decisions: [
+      "Scoped every record by organization and enforced access with PostgreSQL Row Level Security.",
+      "Stored share-link tokens as SHA-256 hashes and routed anonymous submissions through a validating Edge Function.",
+      "Kept generated schedules as drafts until a coordinator explicitly publishes them.",
+    ],
+    outcome:
+      "Connected recurring-event setup, availability forms, conflict-aware assignments, schedule images, LINE broadcasts, and configurable reminders in one responsive product.",
+    proof: ["Organization-scoped RLS", "LINE group automation", "Draft and published versions"],
+    externalHref: "https://github.com/cubelated/ifgf-planner",
+    externalLabel: "View repository",
+    externalAction: "github",
     accent: "#ffd166",
     sceneClass: "scene-learnalgo",
   },
   {
     number: "04",
-    eyebrow: "Team project",
-    title: "VirtualClass",
+    eyebrow: "Professional system · distributed architecture",
+    title: "DCIM Platform",
     description:
-      "A collaborative virtual classroom designed to make remote English learning more engaging and natural for students and educators.",
-    impact: "Excellence Award · led a four-person team",
-    stack: ["Flutter", "Firebase", "Classroom assistant", "English learning"],
-    href: "https://youtu.be/DH1pCYupwNM?si=Ty1wVrY7K6U-fRbY",
-    linkLabel: "Watch project",
-    action: "watch",
+      "A data-center infrastructure platform for device inventory, operating-system automation, monitoring, network controls, billing integration, and real-time operational updates.",
+    impact: "Three data centers · 70+ devices in the initial prototype",
+    stack: ["Flutter", "WebSockets", "Redis Pub/Sub", "PostgreSQL"],
+    status: "Production system",
+    role: "System architecture, Flutter and backend delivery, technical leadership, and production troubleshooting",
+    problem:
+      "Multiple clients and server instances needed fast, reliable operational updates without treating a transient connection as durable state.",
+    decisions: [
+      "Used PostgreSQL as the source of truth and WebSockets only as change notifications.",
+      "Added Redis Pub/Sub to fan out updates safely across multiple server instances.",
+      "Reconciled missed changes after reconnect using the client's last received timestamp, with manual synchronization as a recovery path.",
+    ],
+    outcome:
+      "Architected the platform across three data centers, integrated more than 70 devices in the prototype, and supported production operations across 100+ client environments.",
+    proof: ["Database reconciliation", "Multi-instance event fan-out", "Production recovery paths"],
     accent: "#c9a7ff",
     sceneClass: "scene-virtualclass",
   },
@@ -118,9 +174,9 @@ const sceneNames = [
   "Start",
   "Mission",
   "Renewables",
-  "Flyfitnity",
-  "LearnAlgo",
-  "VirtualClass",
+  "Selah",
+  "IFGF Planner",
+  "DCIM Platform",
   "HostingInside",
   "Feng Chia University",
   "Education",
@@ -150,6 +206,7 @@ const SECTION_ACTIVE_RADIUS = 0.4;
 const SCENE_FADE_MS = 620;
 const CHAPTER_TOAST_MS = 3200;
 const scenePosition = (scene: number) => scene * SECTION_SPACING;
+const slugify = (value: string) => value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(^-|-$)/g, "");
 
 function PixelCharacter({
   direction,
@@ -178,7 +235,7 @@ function PixelCharacter({
       <div className="knight-shadow" />
       <div className="knight-sprite-wrap">
         <img
-          className="knight-sprite"
+          className="knight-sprite knight-sprite-primary"
           src={sprite}
           alt=""
           draggable="false"
@@ -191,9 +248,8 @@ function PixelCharacter({
   );
 }
 
-function ActionIcon({ action }: { action: Project["action"] }) {
+function ActionIcon({ action }: { action?: Project["externalAction"] }) {
   if (action === "github") return <Github size={16} />;
-  if (action === "watch") return <Play size={15} fill="currentColor" />;
   return <ArrowUpRight size={16} />;
 }
 
@@ -202,18 +258,22 @@ function ProjectScene({
   index,
   sceneStyle,
   phase,
+  onOpenCaseStudy,
 }: {
   project: Project;
   index: number;
   sceneStyle: CSSProperties;
   phase: ScenePhase;
+  onOpenCaseStudy: (project: Project) => void;
 }) {
+  const projectId = slugify(project.title);
+
   return (
     <section
-      id={project.title.toLowerCase()}
+      id={projectId}
       className={`game-scene project-scene ${project.sceneClass}`}
       data-scene-phase={phase}
-      aria-labelledby={`${project.title.toLowerCase()}-title`}
+      aria-labelledby={`${projectId}-title`}
       aria-hidden={phase !== "visible"}
       style={{ ...sceneStyle, "--project-accent": project.accent } as CSSProperties}
     >
@@ -222,33 +282,43 @@ function ProjectScene({
         <span className="pixel-cloud cloud-b" />
       </div>
 
-      <article className="scene-panel project-panel">
+      <article className="scene-panel project-panel panel-scroll">
         <div className="panel-index">
           <span>PROJECT LOG</span>
           <strong>{project.number}/04</strong>
         </div>
-        <p className="scene-eyebrow">{project.eyebrow}</p>
-        <h2 id={`${project.title.toLowerCase()}-title`}>{project.title}</h2>
+        <div className="project-heading-row">
+          <p className="scene-eyebrow">{project.eyebrow}</p>
+          <span className="project-status">{project.status}</span>
+        </div>
+        <h2 id={`${projectId}-title`}>{project.title}</h2>
         <p className="project-description">{project.description}</p>
         <p className="impact-line">
           <span aria-hidden="true">◆</span>
           {project.impact}
         </p>
+        <p className="project-role"><strong>MY ROLE</strong>{project.role}</p>
         <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
           {project.stack.map((technology) => (
             <li key={technology}>{technology}</li>
           ))}
         </ul>
-        <a
-          className="pixel-action"
-          href={project.href}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <ActionIcon action={project.action} />
-          {project.linkLabel}
-          <ArrowUpRight size={14} />
-        </a>
+        <div className="project-actions">
+          <button className="pixel-action" onClick={() => onOpenCaseStudy(project)}>
+            OPEN CASE STUDY <ArrowUpRight size={14} />
+          </button>
+          {project.externalHref && (
+            <a
+              className="text-action"
+              href={project.externalHref}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ActionIcon action={project.externalAction} />
+              {project.externalLabel}
+            </a>
+          )}
+        </div>
       </article>
 
       <div className="project-beacon" aria-hidden="true">
@@ -290,9 +360,296 @@ function PixelGround({
   );
 }
 
+const achievements = [
+  { value: "6", label: "Engineers led", detail: "Architecture, reviews, mentoring, and delivery" },
+  { value: "3", label: "Data centers", detail: "DCIM architecture and infrastructure automation" },
+  { value: "100+", label: "Client environments", detail: "Linux, networking, and production troubleshooting" },
+  { value: "80%", label: "Efficiency improvement", detail: "POS modernization and workflow automation" },
+  { value: "200+", label: "Student users", detail: "Dockerized Flutter and Next.js education system" },
+];
+
+const expertiseAreas = [
+  {
+    icon: "mobile",
+    title: "Mobile Engineering",
+    summary: "Cross-platform products that behave like production software, not demos.",
+    skills: ["Flutter", "Dart", "Kotlin", "Riverpod", "Android & iOS lifecycle", "Widgets", "Deep links"],
+    evidence: ["Renewables", "Selah", "Feng Chia Economics app"],
+  },
+  {
+    icon: "backend",
+    title: "Backend & Distributed Systems",
+    summary: "Reliable state, event delivery, recovery paths, and security boundaries.",
+    skills: ["PostgreSQL", "Supabase", "WebSockets", "Redis Pub/Sub", "Edge Functions", "RLS"],
+    evidence: ["DCIM Platform", "Renewables", "IFGF Planner"],
+  },
+  {
+    icon: "infra",
+    title: "Web & Infrastructure",
+    summary: "Systems that survive the distance between source code and production.",
+    skills: ["React", "Next.js", "Cloudflare", "Docker", "Linux", "Network troubleshooting", "CI/CD"],
+    evidence: ["IFGF Planner", "HostingInside platforms", "VirtualClass"],
+  },
+  {
+    icon: "leadership",
+    title: "Product & Technical Leadership",
+    summary: "Turning unclear operational problems into deliverable product systems.",
+    skills: ["System design", "Product discovery", "Code review", "Mentoring", "Delivery planning", "Production support"],
+    evidence: ["Six-engineer team", "Independent products", "Four-person university team"],
+  },
+];
+
+const archiveProjects = [
+  {
+    title: "Flyfitnity",
+    detail: "Award-winning Flutter and Raspberry Pi fitness system with real-time Bluetooth feedback.",
+    href: "https://github.com/cubelated/flyfitnity_bluetooth_connection",
+    label: "Repository",
+  },
+  {
+    title: "LearnAlgo",
+    detail: "Master's research translating embodied cognition into an interactive algorithm-learning experience.",
+    href: "https://www.youtube.com/watch?v=ATqbLGN2ZBk&list=PLM97qnUGt3wg2bZ5MLHqysTbSy3SXrm1i",
+    label: "Demo",
+  },
+  {
+    title: "VirtualClass",
+    detail: "Excellence Award team project for collaborative remote English learning, used by 200+ students.",
+    href: "https://youtu.be/DH1pCYupwNM?si=Ty1wVrY7K6U-fRbY",
+    label: "Demo",
+  },
+];
+
+function ExpertiseIcon({ icon }: { icon: string }) {
+  if (icon === "mobile") return <Smartphone aria-hidden="true" />;
+  if (icon === "backend") return <Database aria-hidden="true" />;
+  if (icon === "infra") return <Layers3 aria-hidden="true" />;
+  return <Users aria-hidden="true" />;
+}
+
+function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
+  return (
+    <div className="quick-portfolio" id="quick-start">
+      <header className="quick-header">
+        <a className="quick-brand" href="#quick-start" aria-label="Hanssen portfolio home">
+          <img src="/cubelated-pixel-logo.png" alt="" />
+          <span><strong>HANSSEN WIJAYA</strong><small>SOFTWARE ENGINEER</small></span>
+        </a>
+        <nav aria-label="Quick portfolio navigation">
+          <a href="#selected-work">Work</a>
+          <a href="#skill-tree">Expertise</a>
+          <a href="#career-map">Experience</a>
+          <a href="#current-quest">Building now</a>
+          <a href="#quick-contact">Contact</a>
+        </nav>
+        <button className="view-switch" onClick={onExplore}>
+          EXPLORE MODE <ArrowRight size={15} />
+        </button>
+      </header>
+
+      <div className="quick-content">
+        <section className="quick-hero" aria-labelledby="quick-title">
+          <div className="quick-hero-copy">
+            <p className="quick-kicker">SOFTWARE ENGINEER · MOBILE · DISTRIBUTED SYSTEMS</p>
+            <h1 id="quick-title">I BUILD PRODUCTION-GRADE MOBILE PRODUCTS AND THE SYSTEMS BEHIND THEM.</h1>
+            <p>
+              I&apos;m Hanssen Budisantoso Wijaya, a software engineer focused on Flutter,
+              Android, full-stack products, and infrastructure. I turn complex operational
+              problems into dependable software that people can actually use.
+            </p>
+            <div className="quick-actions">
+              <a className="quick-button primary" href="#selected-work">VIEW SELECTED WORK <ArrowRight size={16} /></a>
+              <button className="quick-button secondary" onClick={onExplore}>PLAY THE PORTFOLIO</button>
+              <a className="quick-text-link" href="https://www.linkedin.com/in/hanssen-budisantoso-wijaya/" target="_blank" rel="noreferrer">
+                LINKEDIN <ArrowUpRight size={14} />
+              </a>
+            </div>
+          </div>
+          <figure className="quick-profile">
+            <img src="/hanssen-profile.jpg" alt="Hanssen Budisantoso Wijaya" />
+            <figcaption><span /> AVAILABLE FOR SOFTWARE ENGINEERING OPPORTUNITIES</figcaption>
+          </figure>
+        </section>
+
+        <section className="achievement-strip" aria-label="Professional achievements">
+          {achievements.map((achievement) => (
+            <article key={achievement.label}>
+              <strong>{achievement.value}</strong>
+              <span>{achievement.label}</span>
+              <p>{achievement.detail}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="quick-section" id="selected-work" aria-labelledby="selected-work-title">
+          <div className="section-heading">
+            <div><p>QUEST LOG</p><h2 id="selected-work-title">SELECTED WORK</h2></div>
+            <span>Four projects selected for engineering depth, product judgment, and production impact.</span>
+          </div>
+
+          <div className="case-study-list">
+            {projects.map((project) => (
+              <article
+                className="case-study"
+                id={`case-${slugify(project.title)}`}
+                key={project.title}
+                style={{ "--project-accent": project.accent } as CSSProperties}
+              >
+                <div className="case-study-topline">
+                  <span>{project.number}</span>
+                  <p>{project.eyebrow}</p>
+                  <strong>{project.status}</strong>
+                </div>
+                <div className="case-study-intro">
+                  <div>
+                    <h3>{project.title}</h3>
+                    <p>{project.description}</p>
+                  </div>
+                  <ul aria-label={`${project.title} technology stack`}>
+                    {project.stack.map((technology) => <li key={technology}>{technology}</li>)}
+                  </ul>
+                </div>
+                <div className="case-study-grid">
+                  <div><span>PROBLEM</span><p>{project.problem}</p></div>
+                  <div><span>MY ROLE</span><p>{project.role}</p></div>
+                  <div className="decision-card">
+                    <span>KEY ENGINEERING DECISIONS</span>
+                    <ol>{project.decisions.map((decision) => <li key={decision}>{decision}</li>)}</ol>
+                  </div>
+                  <div><span>OUTCOME</span><p>{project.outcome}</p></div>
+                </div>
+                {project.title === "DCIM Platform" && (
+                  <div className="architecture-block">
+                    <div className="architecture-copy">
+                      <span>DECISION SPOTLIGHT</span>
+                      <h4>Fast notifications. Durable truth.</h4>
+                      <p>The database owns state; the real-time layer only announces that state changed. Reconnection reconciles anything the client missed.</p>
+                    </div>
+                    <div className="architecture-flow" role="img" aria-label="DCIM update flow from Flutter clients through the API and PostgreSQL, then WebSockets and Redis Pub/Sub back to clients">
+                      <span>Flutter clients</span><i>write</i><span>API + PostgreSQL</span><i>notify</i><span>WebSocket gateway</span><i>fan out</i><span>Redis Pub/Sub</span>
+                    </div>
+                  </div>
+                )}
+                <div className="case-study-footer">
+                  <ul>{project.proof.map((item) => <li key={item}><CheckCircle2 size={15} />{item}</li>)}</ul>
+                  {project.externalHref ? (
+                    <a href={project.externalHref} target="_blank" rel="noreferrer">
+                      <ActionIcon action={project.externalAction} /> {project.externalLabel} <ArrowUpRight size={14} />
+                    </a>
+                  ) : (
+                    <span className="private-code"><ShieldCheck size={15} /> Private or proprietary source</span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="quick-section" id="skill-tree" aria-labelledby="skill-tree-title">
+          <div className="section-heading">
+            <div><p>SKILL TREE</p><h2 id="skill-tree-title">EXPERTISE WITH EVIDENCE</h2></div>
+            <span>No arbitrary percentages. Every capability points to work that proves it.</span>
+          </div>
+          <div className="expertise-grid">
+            {expertiseAreas.map((area) => (
+              <article key={area.title}>
+                <div className="expertise-title"><ExpertiseIcon icon={area.icon} /><h3>{area.title}</h3></div>
+                <p>{area.summary}</p>
+                <ul className="expertise-skills">{area.skills.map((skill) => <li key={skill}>{skill}</li>)}</ul>
+                <div className="expertise-proof"><span>PROVEN IN</span>{area.evidence.map((item) => <strong key={item}>{item}</strong>)}</div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="current-quest" id="current-quest" aria-labelledby="current-quest-title">
+          <div className="current-quest-label"><span /> CURRENT QUEST · SELAH</div>
+          <div>
+            <p>BUILDING IN PUBLIC</p>
+            <h2 id="current-quest-title">A DEVOTIONAL APP DESIGNED TO MAKE ITSELF LESS NECESSARY.</h2>
+          </div>
+          <div className="current-quest-copy">
+            <p>Selah guides a person into a physical Bible, reflection, and prayer without turning faith into engagement metrics.</p>
+            <ul>
+              <li>Encrypted, local-first private journal</li>
+              <li>Resumable guided sessions and 40-day formation journey</li>
+              <li>Current focus: release readiness, visual motion, and session polish</li>
+            </ul>
+          </div>
+          <a href="#case-selah">READ THE CASE STUDY <ArrowUpRight size={15} /></a>
+        </section>
+
+        <section className="quick-section" id="career-map" aria-labelledby="career-title">
+          <div className="section-heading">
+            <div><p>CAREER MAP</p><h2 id="career-title">EXPERIENCE &amp; EDUCATION</h2></div>
+            <span>From hands-on production support to architecture and team leadership.</span>
+          </div>
+          <div className="career-layout">
+            <div className="career-timeline">
+              <article>
+                <time>JUN 2024 — MAY 2026</time>
+                <div><p>HOSTINGINSIDE LTD</p><h3>Lead Software Engineer</h3><ul><li>Led six engineers across infrastructure and multi-platform products.</li><li>Architected a DCIM platform spanning three data centers.</li><li>Led a multi-OS POS SaaS modernization that improved operational efficiency by 80%.</li></ul></div>
+              </article>
+              <article>
+                <time>MAY 2022 — MAY 2024</time>
+                <div><p>HOSTINGINSIDE LTD</p><h3>Software Engineer</h3><ul><li>Built infrastructure automation and operational tools.</li><li>Integrated 70+ devices into the first DCIM prototype.</li><li>Resolved Linux and networking issues across 100+ client environments.</li></ul></div>
+              </article>
+              <article>
+                <time>SEP 2022 — JAN 2024</time>
+                <div><p>FENG CHIA UNIVERSITY</p><h3>Software Maintainer</h3><ul><li>Maintained and released the university Flutter Economics application.</li></ul></div>
+              </article>
+            </div>
+            <aside className="education-stack">
+              <article><span>MSc · 2024</span><h3>Information Engineering &amp; Computer Science</h3><p>Feng Chia University</p><strong>Rank 7 / 49 · GPA 4.1 / 5.0</strong></article>
+              <article><span>BSc · 2022</span><h3>Information Engineering &amp; Computer Science</h3><p>Feng Chia University</p><strong>GPA 3.8 / 4.0</strong></article>
+            </aside>
+          </div>
+        </section>
+
+        <section className="quick-section engineering-notes" aria-labelledby="notes-title">
+          <div className="section-heading">
+            <div><p>ENGINEERING NOTES</p><h2 id="notes-title">HOW I MAKE TRADE-OFFS</h2></div>
+            <span>Short decision records from real products and systems.</span>
+          </div>
+          <div className="notes-grid">
+            <article><Code2 /><span>REAL-TIME SYSTEMS</span><h3>Notifications are not state.</h3><p>WebSockets make change visible quickly; PostgreSQL makes it recoverable. That distinction shaped reconnection and synchronization.</p></article>
+            <article><ShieldCheck /><span>PRIVACY</span><h3>Sometimes the right backend is no backend.</h3><p>Selah keeps sensitive journals local, encrypts storage, and gives the user an explicit encrypted export instead of silent cloud collection.</p></article>
+            <article><Globe2 /><span>PUBLIC WORKFLOWS</span><h3>A secret URL is not authorization.</h3><p>IFGF Planner hashes share tokens, validates them server-side, and keeps privileged database operations away from anonymous browsers.</p></article>
+          </div>
+        </section>
+
+        <section className="quick-section" aria-labelledby="archive-title">
+          <div className="section-heading">
+            <div><p>PROJECT ARCHIVE</p><h2 id="archive-title">EARLIER BUILDS</h2></div>
+            <span>Research, IoT, and collaborative learning work that shaped the systems I build now.</span>
+          </div>
+          <div className="archive-grid">
+            {archiveProjects.map((project) => (
+              <article key={project.title}><h3>{project.title}</h3><p>{project.detail}</p><a href={project.href} target="_blank" rel="noreferrer">{project.label} <ArrowUpRight size={14} /></a></article>
+            ))}
+          </div>
+        </section>
+
+        <section className="quick-contact" id="quick-contact" aria-labelledby="quick-contact-title">
+          <p>FINAL CHECKPOINT</p>
+          <h2 id="quick-contact-title">HAVE A MEANINGFUL PROBLEM TO SOLVE?</h2>
+          <span>I&apos;m open to software engineering opportunities involving mobile products, distributed systems, and ambitious operational problems.</span>
+          <div>
+            <a className="quick-button primary" href="mailto:hanssenbudi@gmail.com"><Mail size={16} /> EMAIL ME</a>
+            <a className="quick-button secondary" href="https://github.com/cubelated" target="_blank" rel="noreferrer"><Github size={16} /> GITHUB</a>
+            <a className="quick-button secondary" href="https://www.linkedin.com/in/hanssen-budisantoso-wijaya/" target="_blank" rel="noreferrer"><Linkedin size={16} /> LINKEDIN</a>
+          </div>
+          <small>© {new Date().getFullYear()} HANSSEN BUDISANTOSO WIJAYA · BUILD WITH PURPOSE</small>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const lastScene = sceneNames.length - 1;
   const maxPosition = scenePosition(lastScene);
+  const [viewMode, setViewMode] = useState<ViewMode>("explore");
   const [position, setPosition] = useState(0);
   const [direction, setDirection] = useState<TravelDirection>(1);
   const [motion, setMotion] = useState<MotionMode>("idle");
@@ -328,6 +685,40 @@ export default function Home() {
   const setWorldPosition = useCallback((nextPosition: number) => {
     positionRef.current = nextPosition;
     setPosition(nextPosition);
+  }, []);
+
+  const setPortfolioView = useCallback((nextView: ViewMode) => {
+    setViewMode(nextView);
+    try {
+      window.localStorage.setItem("portfolio-view", nextView);
+    } catch {
+      // The view toggle still works when storage is unavailable.
+    }
+  }, []);
+
+  const openCaseStudy = useCallback(
+    (project: Project) => {
+      setPortfolioView("quick");
+      window.history.replaceState(null, "", `#case-${slugify(project.title)}`);
+      requestAnimationFrame(() => {
+        document.getElementById(`case-${slugify(project.title)}`)?.scrollIntoView({ block: "start" });
+      });
+    },
+    [setPortfolioView],
+  );
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    const quickHash = hash.startsWith("case-") || ["quick-start", "selected-work", "skill-tree", "career-map", "current-quest", "quick-contact"].includes(hash);
+    let savedView: string | null = null;
+    try {
+      savedView = window.localStorage.getItem("portfolio-view");
+    } catch {
+      savedView = null;
+    }
+    if (!quickHash && savedView !== "quick") return;
+    const viewFrame = requestAnimationFrame(() => setViewMode("quick"));
+    return () => cancelAnimationFrame(viewFrame);
   }, []);
 
   const animateTo = useCallback(
@@ -744,6 +1135,7 @@ export default function Home() {
   );
 
   const onWheel = (event: ReactWheelEvent<HTMLElement>) => {
+    if (viewMode === "quick") return;
     const target = event.target as HTMLElement;
     if (target.closest(".panel-scroll")) return;
 
@@ -765,12 +1157,14 @@ export default function Home() {
   };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if (viewMode === "quick") return;
     const target = event.target as HTMLElement;
     if (target.closest("a, button, .panel-scroll")) return;
     pointerStart.current = { x: event.clientX, y: event.clientY };
   };
 
   const onPointerUp = (event: ReactPointerEvent<HTMLElement>) => {
+    if (viewMode === "quick") return;
     if (!pointerStart.current) return;
     const deltaX = event.clientX - pointerStart.current.x;
     const deltaY = event.clientY - pointerStart.current.y;
@@ -782,6 +1176,7 @@ export default function Home() {
   };
 
   const onWorldDoubleClick = (event: ReactMouseEvent<HTMLElement>) => {
+    if (viewMode === "quick") return;
     const target = event.target as HTMLElement;
     if (target.closest("a, button")) return;
 
@@ -804,7 +1199,7 @@ export default function Home() {
     name: "Hanssen Budisantoso Wijaya",
     alternateName: ["黃晟旺", "cubelated"],
     image: "https://cubelated.com/hanssen-profile.jpg",
-    jobTitle: "Mobile and Full-Stack Software Engineer",
+    jobTitle: "Software Engineer",
     email: "mailto:hanssenbudi@gmail.com",
     sameAs: [
       "https://www.linkedin.com/in/hanssen-budisantoso-wijaya/",
@@ -820,6 +1215,7 @@ export default function Home() {
       "Software Engineering",
       "Flutter",
       "Mobile Applications",
+      "Distributed Systems",
       "Full-stack Development",
       "System Architecture",
       "Infrastructure Automation",
@@ -829,6 +1225,7 @@ export default function Home() {
   return (
     <main
       className="game-shell"
+      data-view-mode={viewMode}
       onWheel={onWheel}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
@@ -838,6 +1235,10 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      {viewMode === "quick" ? (
+        <QuickPortfolio onExplore={() => setPortfolioView("explore")} />
+      ) : (
+      <>
       <a className="skip-link" href="#contact" onClick={() => jumpTo(9)}>
         Skip to contact
       </a>
@@ -872,10 +1273,15 @@ export default function Home() {
           })}
         </nav>
 
-        <a className="header-contact" href="mailto:hanssenbudi@gmail.com">
-          <span className="status-light" />
-          AVAILABLE
-        </a>
+        <div className="header-actions">
+          <button className="view-switch compact" onClick={() => setPortfolioView("quick")}>
+            QUICK VIEW
+          </button>
+          <a className="header-contact" href="mailto:hanssenbudi@gmail.com">
+            <span className="status-light" />
+            AVAILABLE
+          </a>
+        </div>
       </header>
 
       <div className="game-progress" aria-hidden="true">
@@ -932,6 +1338,9 @@ export default function Home() {
             <div className="hero-actions">
               <button className="pixel-action" onClick={() => travel(1)}>
                 BEGIN JOURNEY <ArrowRight size={16} />
+              </button>
+              <button className="text-action" onClick={() => setPortfolioView("quick")}>
+                QUICK VIEW <ArrowUpRight size={13} />
               </button>
               <a
                 className="text-action"
@@ -994,6 +1403,7 @@ export default function Home() {
             index={index}
             sceneStyle={sceneStyle(index + 2)}
             phase={scenePhases[index + 2]}
+            onOpenCaseStudy={openCaseStudy}
           />
         ))}
 
@@ -1217,6 +1627,8 @@ export default function Home() {
         <span>{String(sceneNames.length).padStart(2, "0")}</span>
         <strong>{activeScene === null ? "BETWEEN PAGES" : sceneNames[activeScene]}</strong>
       </div>
+      </>
+      )}
     </main>
   );
 }

@@ -32,7 +32,10 @@ test("renders development preview metadata", async () => {
   const html = await response.text();
   assert.match(html, developmentPreviewMeta);
   assert.match(html, /Building to[\s\S]*Impact Lives/i);
+  assert.match(html, /production-grade mobile products/i);
+  assert.match(html, /expertise with evidence/i);
+  assert.match(html, /DCIM Platform/i);
   assert.match(html, /renewables\.cubelated\.com/i);
-  assert.match(html, /github\.com\/cubelated\/flyfitnity_bluetooth_connection/i);
+  assert.match(html, /github\.com\/cubelated\/ifgf-planner/i);
   assert.match(html, /application\/ld\+json/i);
 });

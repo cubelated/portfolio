@@ -8,11 +8,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL("https://cubelated.com"),
   title: {
-    default: "Cubelated | Interactive Pixel Portfolio",
-    template: "%s | Cubelated",
+    default: "Hanssen Wijaya | Software Engineer",
+    template: "%s | Hanssen Wijaya",
   },
   description:
-    "Explore the interactive pixel portfolio of Hanssen Budisantoso Wijaya, a mobile and full-stack software engineer building products with purpose.",
+    "Software engineer Hanssen Budisantoso Wijaya builds production-grade mobile products, distributed systems, and full-stack platforms with Flutter, Android, and modern cloud infrastructure.",
   keywords: [
     "Hanssen Budisantoso Wijaya",
     "黃晟旺",
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "profile",
     locale: "en_US",
-    title: "Cubelated | Interactive Pixel Portfolio",
-    description: "Walk through the products, experience, and mission of software engineer Hanssen Budisantoso Wijaya.",
+    title: "Hanssen Wijaya | Software Engineer",
+    description: "Selected mobile products, distributed systems, technical decisions, and professional impact—with an optional playable pixel journey.",
     siteName: "Cubelated",
     url: "https://cubelated.com/",
     images: [{ url: "/hanssen-profile.jpg", width: 683, height: 721, alt: "Hanssen Budisantoso Wijaya" }],
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cubelated | Interactive Pixel Portfolio",
-    description: "A playable portfolio about building software with purpose.",
+    title: "Hanssen Wijaya | Software Engineer",
+    description: "Production-grade mobile products, distributed systems, and purposeful software.",
     images: ["/hanssen-profile.jpg"],
   },
   robots: {
