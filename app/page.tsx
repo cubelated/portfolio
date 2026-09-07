@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -89,7 +90,7 @@ const projects: Project[] = [
   },
   {
     number: "02",
-    eyebrow: "Current quest · privacy-first mobile",
+    eyebrow: "In development · privacy-first mobile",
     title: "Selah",
     description:
       "A quiet-time companion that guides people to pause, put the phone down, read a physical Bible, reflect, pray, and gradually need the app less.",
@@ -208,45 +209,47 @@ const CHAPTER_TOAST_MS = 3200;
 const scenePosition = (scene: number) => scene * SECTION_SPACING;
 const slugify = (value: string) => value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(^-|-$)/g, "");
 
-function PixelCharacter({
+const characterSprites = [
+  { state: "idle", src: "/knight/idle-breathing-south.gif" },
+  { state: "walk-south-east", src: "/knight/walking-south-east.gif" },
+  { state: "walk-south-west", src: "/knight/walking-south-west.gif" },
+  { state: "dash-south-east", src: "/knight/dash-south-east.png" },
+  { state: "dash-south-west", src: "/knight/dash-south-west.png" },
+];
+
+const PixelCharacter = memo(function PixelCharacter({
   direction,
   mode,
 }: {
   direction: TravelDirection;
   mode: MotionMode;
 }) {
-  const facing = direction === -1 ? "south-west" : "south-east";
-  const sprite =
-    mode === "idle"
-      ? "/knight/idle-breathing-south.gif"
-      : mode === "walk"
-        ? `/knight/walking-${facing}.gif`
-        : `/knight/dash-${facing}.png`;
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
+  const state = mode === "idle" ? "idle" : `${mode}-${direction === -1 ? "south-west" : "south-east"}`;
+  const ready = loaded[state] === true;
 
   return (
-    <div
-      className="character-stage"
-      data-direction={direction}
-      data-motion={mode}
-      aria-hidden="true"
-    >
+    <div className="character-stage" data-direction={direction} data-motion={mode} aria-hidden="true">
       <div className="dash-trail trail-one" />
       <div className="dash-trail trail-two" />
       <div className="knight-shadow" />
       <div className="knight-sprite-wrap">
-        <img
-          className="knight-sprite knight-sprite-primary"
-          src={sprite}
-          alt=""
-          draggable="false"
-        />
+        <img className="knight-sprite knight-sprite-fallback" src="/knight/idle-south.png"
+          data-active={!ready} alt="" width={128} height={128} draggable={false} />
+        {characterSprites.map((sprite) => (
+          <img key={sprite.state} className="knight-sprite knight-sprite-animated"
+            src={sprite.src} data-active={ready && state === sprite.state}
+            onLoad={() => setLoaded((current) => ({ ...current, [sprite.state]: true }))}
+            onError={() => setLoaded((current) => ({ ...current, [sprite.state]: false }))}
+            alt="" width={128} height={128} loading="eager" draggable={false} />
+        ))}
       </div>
       <div className="dust dust-one" />
       <div className="dust dust-two" />
       <div className="dust dust-three" />
     </div>
   );
-}
+});
 
 function ActionIcon({ action }: { action?: Project["externalAction"] }) {
   if (action === "github") return <Github size={16} />;
@@ -275,6 +278,7 @@ function ProjectScene({
       data-scene-phase={phase}
       aria-labelledby={`${projectId}-title`}
       aria-hidden={phase !== "visible"}
+      inert={phase !== "visible"}
       style={{ ...sceneStyle, "--project-accent": project.accent } as CSSProperties}
     >
       <div className="pixel-sky-detail">
@@ -282,7 +286,7 @@ function ProjectScene({
         <span className="pixel-cloud cloud-b" />
       </div>
 
-      <article className="scene-panel project-panel panel-scroll">
+      <article className="scene-panel project-panel panel-scroll" tabIndex={0}>
         <div className="panel-index">
           <span>PROJECT LOG</span>
           <strong>{project.number}/04</strong>
@@ -372,7 +376,7 @@ const expertiseAreas = [
   {
     icon: "mobile",
     title: "Mobile Engineering",
-    summary: "Cross-platform products that behave like production software, not demos.",
+    summary: "Cross-platform applications built for reliable everyday use.",
     skills: ["Flutter", "Dart", "Kotlin", "Riverpod", "Android & iOS lifecycle", "Widgets", "Deep links"],
     evidence: ["Renewables", "Selah", "Feng Chia Economics app"],
   },
@@ -386,14 +390,14 @@ const expertiseAreas = [
   {
     icon: "infra",
     title: "Web & Infrastructure",
-    summary: "Systems that survive the distance between source code and production.",
+    summary: "Web applications and infrastructure built for deployment, maintenance, and growth.",
     skills: ["React", "Next.js", "Cloudflare", "Docker", "Linux", "Network troubleshooting", "CI/CD"],
     evidence: ["IFGF Planner", "HostingInside platforms", "VirtualClass"],
   },
   {
     icon: "leadership",
     title: "Product & Technical Leadership",
-    summary: "Turning unclear operational problems into deliverable product systems.",
+    summary: "Translating complex requirements into practical products and clear delivery plans.",
     skills: ["System design", "Product discovery", "Code review", "Mentoring", "Delivery planning", "Production support"],
     evidence: ["Six-engineer team", "Independent products", "Four-person university team"],
   },
@@ -451,15 +455,15 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
         <section className="quick-hero" aria-labelledby="quick-title">
           <div className="quick-hero-copy">
             <p className="quick-kicker">SOFTWARE ENGINEER · MOBILE · DISTRIBUTED SYSTEMS</p>
-            <h1 id="quick-title">I BUILD PRODUCTION-GRADE MOBILE PRODUCTS AND THE SYSTEMS BEHIND THEM.</h1>
+            <h1 id="quick-title" tabIndex={-1}>MOBILE PRODUCTS. RELIABLE SYSTEMS. BUILT WITH PURPOSE.</h1>
             <p>
               I&apos;m Hanssen Budisantoso Wijaya, a software engineer focused on Flutter,
               Android, full-stack products, and infrastructure. I turn complex operational
-              problems into dependable software that people can actually use.
+              problems into dependable, accessible software.
             </p>
             <div className="quick-actions">
               <a className="quick-button primary" href="#selected-work">VIEW SELECTED WORK <ArrowRight size={16} /></a>
-              <button className="quick-button secondary" onClick={onExplore}>PLAY THE PORTFOLIO</button>
+              <button className="quick-button secondary" onClick={onExplore}>EXPLORE THE PORTFOLIO</button>
               <a className="quick-text-link" href="https://www.linkedin.com/in/hanssen-budisantoso-wijaya/" target="_blank" rel="noreferrer">
                 LINKEDIN <ArrowUpRight size={14} />
               </a>
@@ -484,7 +488,7 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
         <section className="quick-section" id="selected-work" aria-labelledby="selected-work-title">
           <div className="section-heading">
             <div><p>QUEST LOG</p><h2 id="selected-work-title">SELECTED WORK</h2></div>
-            <span>Four projects selected for engineering depth, product judgment, and production impact.</span>
+            <span>Selected projects, with the problems, technical decisions, and outcomes behind each one.</span>
           </div>
 
           <div className="case-study-list">
@@ -522,7 +526,7 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
                   <div className="architecture-block">
                     <div className="architecture-copy">
                       <span>DECISION SPOTLIGHT</span>
-                      <h4>Fast notifications. Durable truth.</h4>
+                      <h4>Responsive updates. Recoverable state.</h4>
                       <p>The database owns state; the real-time layer only announces that state changed. Reconnection reconciles anything the client missed.</p>
                     </div>
                     <div className="architecture-flow" role="img" aria-label="DCIM update flow from Flutter clients through the API and PostgreSQL, then WebSockets and Redis Pub/Sub back to clients">
@@ -547,8 +551,8 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
 
         <section className="quick-section" id="skill-tree" aria-labelledby="skill-tree-title">
           <div className="section-heading">
-            <div><p>SKILL TREE</p><h2 id="skill-tree-title">EXPERTISE WITH EVIDENCE</h2></div>
-            <span>No arbitrary percentages. Every capability points to work that proves it.</span>
+            <div><p>SKILL TREE</p><h2 id="skill-tree-title">ENGINEERING EXPERTISE</h2></div>
+            <span>Core capabilities developed through shipped products and production systems.</span>
           </div>
           <div className="expertise-grid">
             {expertiseAreas.map((area) => (
@@ -556,7 +560,7 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
                 <div className="expertise-title"><ExpertiseIcon icon={area.icon} /><h3>{area.title}</h3></div>
                 <p>{area.summary}</p>
                 <ul className="expertise-skills">{area.skills.map((skill) => <li key={skill}>{skill}</li>)}</ul>
-                <div className="expertise-proof"><span>PROVEN IN</span>{area.evidence.map((item) => <strong key={item}>{item}</strong>)}</div>
+                <div className="expertise-proof"><span>APPLIED IN</span>{area.evidence.map((item) => <strong key={item}>{item}</strong>)}</div>
               </article>
             ))}
           </div>
@@ -566,10 +570,10 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
           <div className="current-quest-label"><span /> CURRENT QUEST · SELAH</div>
           <div>
             <p>BUILDING IN PUBLIC</p>
-            <h2 id="current-quest-title">A DEVOTIONAL APP DESIGNED TO MAKE ITSELF LESS NECESSARY.</h2>
+            <h2 id="current-quest-title">MORE TIME IN SCRIPTURE. LESS TIME ON YOUR PHONE.</h2>
           </div>
           <div className="current-quest-copy">
-            <p>Selah guides a person into a physical Bible, reflection, and prayer without turning faith into engagement metrics.</p>
+            <p>Selah helps people prepare for devotional time, read a physical Bible, reflect, and pray.</p>
             <ul>
               <li>Encrypted, local-first private journal</li>
               <li>Resumable guided sessions and 40-day formation journey</li>
@@ -612,9 +616,9 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
             <span>Short decision records from real products and systems.</span>
           </div>
           <div className="notes-grid">
-            <article><Code2 /><span>REAL-TIME SYSTEMS</span><h3>Notifications are not state.</h3><p>WebSockets make change visible quickly; PostgreSQL makes it recoverable. That distinction shaped reconnection and synchronization.</p></article>
-            <article><ShieldCheck /><span>PRIVACY</span><h3>Sometimes the right backend is no backend.</h3><p>Selah keeps sensitive journals local, encrypts storage, and gives the user an explicit encrypted export instead of silent cloud collection.</p></article>
-            <article><Globe2 /><span>PUBLIC WORKFLOWS</span><h3>A secret URL is not authorization.</h3><p>IFGF Planner hashes share tokens, validates them server-side, and keeps privileged database operations away from anonymous browsers.</p></article>
+            <article><Code2 /><span>REAL-TIME SYSTEMS</span><h3>Keep state recoverable.</h3><p>WebSockets make change visible quickly; PostgreSQL makes it recoverable. That distinction shaped reconnection and synchronization.</p></article>
+            <article><ShieldCheck /><span>PRIVACY</span><h3>Design privacy into the product.</h3><p>Selah keeps sensitive journals local, encrypts storage, and gives the user an explicit encrypted export instead of silent cloud collection.</p></article>
+            <article><Globe2 /><span>PUBLIC WORKFLOWS</span><h3>Validate every shared link.</h3><p>IFGF Planner hashes share tokens, validates them server-side, and keeps privileged database operations away from anonymous browsers.</p></article>
           </div>
         </section>
 
@@ -633,7 +637,7 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
         <section className="quick-contact" id="quick-contact" aria-labelledby="quick-contact-title">
           <p>FINAL CHECKPOINT</p>
           <h2 id="quick-contact-title">HAVE A MEANINGFUL PROBLEM TO SOLVE?</h2>
-          <span>I&apos;m open to software engineering opportunities involving mobile products, distributed systems, and ambitious operational problems.</span>
+          <span>I&apos;m open to software engineering opportunities involving mobile products, distributed systems, and complex operational workflows.</span>
           <div>
             <a className="quick-button primary" href="mailto:hanssenbudi@gmail.com"><Mail size={16} /> EMAIL ME</a>
             <a className="quick-button secondary" href="https://github.com/cubelated" target="_blank" rel="noreferrer"><Github size={16} /> GITHUB</a>
@@ -670,6 +674,7 @@ export default function Home() {
   const positionRef = useRef(0);
   const targetRef = useRef(0);
   const heldDirection = useRef<TravelDirection | null>(null);
+  const pressedKeys = useRef(new Map<string, TravelDirection>());
   const walkStartedAt = useRef(0);
   const lastQuickRelease = useRef<{
     direction: TravelDirection;
@@ -688,7 +693,20 @@ export default function Home() {
   }, []);
 
   const setPortfolioView = useCallback((nextView: ViewMode) => {
+    heldDirection.current = null;
+    pressedKeys.current.clear();
+    pointerStart.current = null;
+    lastQuickRelease.current = null;
+    if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+    animationFrame.current = null;
+    targetRef.current = positionRef.current;
+    setMotion("idle");
     setViewMode(nextView);
+    requestAnimationFrame(() => {
+      const destination = nextView === "quick" ? document.getElementById("quick-title") : document.querySelector<HTMLElement>(".pixel-brand");
+      destination?.focus({ preventScroll: true });
+    });
+    window.history.replaceState(null, "", nextView === "quick" ? "#quick-start" : `#${slugify(sceneNames[Math.round(positionRef.current / SECTION_SPACING)])}`);
     try {
       window.localStorage.setItem("portfolio-view", nextView);
     } catch {
@@ -717,8 +735,15 @@ export default function Home() {
       savedView = null;
     }
     if (!quickHash && savedView !== "quick") return;
-    const viewFrame = requestAnimationFrame(() => setViewMode("quick"));
-    return () => cancelAnimationFrame(viewFrame);
+    let scrollFrame: number | null = null;
+    const viewFrame = requestAnimationFrame(() => {
+      setViewMode("quick");
+      if (quickHash) scrollFrame = requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }));
+    });
+    return () => {
+      cancelAnimationFrame(viewFrame);
+      if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
+    };
   }, []);
 
   const animateTo = useCallback(
@@ -731,8 +756,10 @@ export default function Home() {
         cancelAnimationFrame(animationFrame.current);
       }
 
+      animationFrame.current = null;
+      heldDirection.current = null;
       targetRef.current = target;
-      if (Math.abs(distance) < 0.001) {
+      if (Math.abs(distance) < 0.001 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         setWorldPosition(target);
         setMotion("idle");
         return;
@@ -792,8 +819,7 @@ export default function Home() {
         (nextDirection === -1 && positionRef.current <= 0.001) ||
         (nextDirection === 1 && positionRef.current >= maxPosition - 0.001);
       if (atRequestedEdge) {
-        heldDirection.current = null;
-        setMotion("idle");
+        stopWalking();
         return;
       }
 
@@ -953,49 +979,63 @@ export default function Home() {
       setHasResolvedInitialHash(true);
     });
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey || event.ctrlKey || event.metaKey) return;
+    return () => cancelAnimationFrame(initializationFrame);
+  }, []);
 
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+  useEffect(() => {
+    if (viewMode !== "explore") return;
+    const keyDirection = (key: string): TravelDirection | null =>
+      key === "arrowright" || key === "d" ? 1 : key === "arrowleft" || key === "a" ? -1 : null;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest("input, textarea, select, [contenteditable], a, button")) return;
+      const key = event.key.toLowerCase();
+      const nextDirection = keyDirection(key);
+      if (nextDirection !== null) {
         event.preventDefault();
-        startWalking(1);
-      } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+        pressedKeys.current.set(key, nextDirection);
+        startWalking(nextDirection);
+      } else if (event.key === "Home" || event.key === "End") {
+        // Preserve native Home/End scrolling inside a focused reading panel.
+        if (target instanceof HTMLElement && target.closest(".scene-panel")) return;
         event.preventDefault();
-        startWalking(-1);
-      } else if (event.key === "Home") {
-        event.preventDefault();
-        jumpTo(0);
-      } else if (event.key === "End") {
-        event.preventDefault();
-        jumpTo(lastScene);
+        jumpTo(event.key === "Home" ? 0 : lastScene);
       }
     };
-
     const onKeyUp = (event: KeyboardEvent) => {
-      const releasedDirection =
-        event.key === "ArrowRight" || event.key.toLowerCase() === "d"
-          ? 1
-          : event.key === "ArrowLeft" || event.key.toLowerCase() === "a"
-            ? -1
-            : null;
-      if (releasedDirection !== null) finishWalkingInput(releasedDirection);
+      const key = event.key.toLowerCase();
+      const releasedDirection = pressedKeys.current.get(key);
+      if (releasedDirection === undefined) return;
+      pressedKeys.current.delete(key);
+      const remaining = [...pressedKeys.current.values()].at(-1);
+      if (remaining !== undefined) startWalking(remaining);
+      else finishWalkingInput(releasedDirection);
     };
-
-    const onBlur = () => stopWalking();
-
+    const resetInput = () => {
+      pressedKeys.current.clear();
+      lastQuickRelease.current = null;
+      pointerStart.current = null;
+      stopWalking();
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) resetInput();
+    };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("blur", onBlur);
+    window.addEventListener("blur", resetInput);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("blur", onBlur);
-      if (animationFrame.current !== null) {
-        cancelAnimationFrame(animationFrame.current);
-      }
-      cancelAnimationFrame(initializationFrame);
+      window.removeEventListener("blur", resetInput);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      pressedKeys.current.clear();
+      heldDirection.current = null;
+      if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
     };
-  }, [finishWalkingInput, jumpTo, lastScene, startWalking, stopWalking]);
+  }, [viewMode, finishWalkingInput, jumpTo, lastScene, startWalking, stopWalking]);
 
   const nearestScene = clamp(
     Math.round(position / SECTION_SPACING),
@@ -1139,7 +1179,14 @@ export default function Home() {
     const target = event.target as HTMLElement;
     if (target.closest(".panel-scroll")) return;
 
-    const axis = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    // A vertical reading gesture must never change chapters.
+    if (Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+      const panel = event.currentTarget.querySelector<HTMLElement>('.game-scene[data-scene-phase="visible"] .scene-panel');
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? (panel?.clientHeight ?? 1) : 1;
+      panel?.scrollBy({ top: event.deltaY * unit, behavior: "instant" });
+      return;
+    }
+    const axis = event.deltaX;
     const now = performance.now();
     if (Math.abs(axis) < 18 || now - lastWheel.current < 680) return;
 
@@ -1178,7 +1225,7 @@ export default function Home() {
   const onWorldDoubleClick = (event: ReactMouseEvent<HTMLElement>) => {
     if (viewMode === "quick") return;
     const target = event.target as HTMLElement;
-    if (target.closest("a, button")) return;
+    if (target.closest("a, button, .scene-panel")) return;
 
     const nextDirection: TravelDirection =
       event.clientX < window.innerWidth / 2 ? -1 : 1;
@@ -1229,6 +1276,7 @@ export default function Home() {
       onWheel={onWheel}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
+      onPointerCancel={() => { pointerStart.current = null; }}
       onDoubleClick={onWorldDoubleClick}
     >
       <script
@@ -1239,8 +1287,11 @@ export default function Home() {
         <QuickPortfolio onExplore={() => setPortfolioView("explore")} />
       ) : (
       <>
-      <a className="skip-link" href="#contact" onClick={() => jumpTo(9)}>
-        Skip to contact
+      <a className="skip-link" href="#quick-start" onClick={(event) => {
+        event.preventDefault();
+        setPortfolioView("quick");
+      }}>
+        Skip to reading view
       </a>
 
       <header className="game-header">
@@ -1275,7 +1326,7 @@ export default function Home() {
 
         <div className="header-actions">
           <button className="view-switch compact" onClick={() => setPortfolioView("quick")}>
-            QUICK VIEW
+            READING VIEW
           </button>
           <a className="header-contact" href="mailto:hanssenbudi@gmail.com">
             <span className="status-light" />
@@ -1300,7 +1351,7 @@ export default function Home() {
             <i />
           </span>
           <span className="achievement-copy">
-            <small>ACHIEVEMENT UNLOCKED</small>
+            <small>CHAPTER DISCOVERED</small>
             <strong>Welcome to {chapterToast.label}</strong>
           </span>
           <span className="achievement-timer" aria-hidden="true" />
@@ -1318,14 +1369,15 @@ export default function Home() {
           data-scene-phase={scenePhases[0]}
           aria-labelledby="hero-title"
           aria-hidden={scenePhases[0] !== "visible"}
+          inert={scenePhases[0] !== "visible"}
           style={sceneStyle(0)}
         >
           <div className="pixel-sun" aria-hidden="true" />
           <span className="pixel-cloud cloud-a" aria-hidden="true" />
           <span className="pixel-cloud cloud-b" aria-hidden="true" />
 
-          <div className="scene-panel hero-panel">
-            <p className="scene-eyebrow">PLAYER 01 · SOFTWARE ENGINEER</p>
+          <div className="scene-panel hero-panel panel-scroll" tabIndex={0}>
+            <p className="scene-eyebrow">HANSSEN WIJAYA · SOFTWARE ENGINEER</p>
             <h1 id="hero-title">
               BUILD WITH
               <span>PURPOSE.</span>
@@ -1336,11 +1388,11 @@ export default function Home() {
               and dependable systems around real human problems.
             </p>
             <div className="hero-actions">
-              <button className="pixel-action" onClick={() => travel(1)}>
-                BEGIN JOURNEY <ArrowRight size={16} />
+              <button className="pixel-action" onClick={() => jumpTo(2)}>
+                EXPLORE MY WORK <ArrowRight size={16} />
               </button>
               <button className="text-action" onClick={() => setPortfolioView("quick")}>
-                QUICK VIEW <ArrowUpRight size={13} />
+                READING VIEW <ArrowUpRight size={13} />
               </button>
               <a
                 className="text-action"
@@ -1366,11 +1418,12 @@ export default function Home() {
           data-scene-phase={scenePhases[1]}
           aria-labelledby="mission-title"
           aria-hidden={scenePhases[1] !== "visible"}
+          inert={scenePhases[1] !== "visible"}
           style={sceneStyle(1)}
         >
           <div className="mission-moon" aria-hidden="true" />
           <span className="pixel-cloud cloud-a" aria-hidden="true" />
-          <div className="scene-panel mission-panel">
+          <div className="scene-panel mission-panel panel-scroll" tabIndex={0}>
             <div className="panel-index">
               <span>QUEST 01</span>
               <strong>MISSION</strong>
@@ -1382,13 +1435,13 @@ export default function Home() {
             </h2>
             <div className="mission-copy">
               <p>
-                I enjoy building software that improves productivity, helps people
-                in day-to-day tasks, and turns complex work into genuine convenience.
+                I enjoy building software that improves productivity, supports everyday tasks,
+                and makes complex workflows easier to manage.
               </p>
               <p>
-                Inspired by Christ&apos;s self-giving love, I want my work to serve
-                people, strengthen society, and help individuals discover and pursue
-                their particular purpose in life — grounded in truth.
+                My Christian faith shapes how I build: with care for people,
+                integrity in my decisions, and a commitment to useful work.
+                I want to create products that make a meaningful difference.
               </p>
             </div>
           </div>
@@ -1413,10 +1466,11 @@ export default function Home() {
           data-scene-phase={scenePhases[6]}
           aria-labelledby="hosting-title"
           aria-hidden={scenePhases[6] !== "visible"}
+          inert={scenePhases[6] !== "visible"}
           style={sceneStyle(6)}
         >
           <div className="city-lights" aria-hidden="true" />
-          <article className="scene-panel experience-panel panel-scroll">
+          <article className="scene-panel experience-panel panel-scroll" tabIndex={0}>
             <div className="panel-index">
               <span>CAREER LOG</span>
               <strong>2022—2026</strong>
@@ -1460,17 +1514,18 @@ export default function Home() {
           data-scene-phase={scenePhases[7]}
           aria-labelledby="fcu-title"
           aria-hidden={scenePhases[7] !== "visible"}
+          inert={scenePhases[7] !== "visible"}
           style={sceneStyle(7)}
         >
           <div className="pixel-sun small-sun" aria-hidden="true" />
           <span className="pixel-cloud cloud-b" aria-hidden="true" />
-          <article className="scene-panel fcu-panel">
+          <article className="scene-panel fcu-panel panel-scroll" tabIndex={0}>
             <div className="panel-index">
               <span>CAREER LOG</span>
               <strong>03/03</strong>
             </div>
             <p className="scene-eyebrow">FENG CHIA UNIVERSITY</p>
-            <h2 id="fcu-title">SOFTWARE ENGINEER MAINTAINER.</h2>
+            <h2 id="fcu-title">SOFTWARE MAINTAINER.</h2>
             <time className="large-time">SEP 2022 — JAN 2024</time>
             <p>
               Maintained and improved the university&apos;s Flutter Economics app,
@@ -1488,7 +1543,7 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
             >
-              VIEW MAINTAINED APP <ArrowUpRight size={15} />
+              VIEW APPLICATION <ArrowUpRight size={15} />
             </a>
           </article>
           <div className="pixel-campus" aria-hidden="true">
@@ -1503,17 +1558,18 @@ export default function Home() {
           data-scene-phase={scenePhases[8]}
           aria-labelledby="education-title"
           aria-hidden={scenePhases[8] !== "visible"}
+          inert={scenePhases[8] !== "visible"}
           style={sceneStyle(8)}
         >
           <span className="pixel-cloud cloud-a" aria-hidden="true" />
           <span className="pixel-cloud cloud-b" aria-hidden="true" />
-          <article className="scene-panel education-panel">
+          <article className="scene-panel education-panel panel-scroll" tabIndex={0}>
             <div className="panel-index">
               <span>ACADEMIC LOG</span>
               <strong>FCU</strong>
             </div>
             <p className="scene-eyebrow">THE FOUNDATION</p>
-            <h2 id="education-title">COMPUTER SCIENCE, TWICE OVER.</h2>
+            <h2 id="education-title">A FOUNDATION IN COMPUTER SCIENCE.</h2>
             <div className="degree-grid">
               <div>
                 <span className="degree-icon">MSc</span>
@@ -1542,12 +1598,13 @@ export default function Home() {
           data-scene-phase={scenePhases[9]}
           aria-labelledby="contact-title"
           aria-hidden={scenePhases[9] !== "visible"}
+          inert={scenePhases[9] !== "visible"}
           style={sceneStyle(9)}
         >
           <div className="portal-ring" aria-hidden="true">
             <img src="/cubelated-pixel-logo.png" alt="" />
           </div>
-          <article className="scene-panel contact-panel">
+          <article className="scene-panel contact-panel panel-scroll" tabIndex={0}>
             <div className="panel-index">
               <span>FINAL CHECKPOINT</span>
               <strong>10/10</strong>
@@ -1555,8 +1612,9 @@ export default function Home() {
             <p className="scene-eyebrow">LET&apos;S MAKE SOMETHING USEFUL</p>
             <h2 id="contact-title">HAVE A MEANINGFUL PROBLEM TO SOLVE?</h2>
             <p>
-              I&apos;m always glad to talk about thoughtful products, ambitious
-              systems, and opportunities to build work that matters.
+              I&apos;m open to software engineering opportunities and collaborations
+              in mobile applications, full-stack products, and infrastructure.
+              Let&apos;s talk about what you&apos;re building.
             </p>
             <div className="contact-actions">
               <a className="pixel-action" href="mailto:hanssenbudi@gmail.com">
@@ -1590,28 +1648,48 @@ export default function Home() {
       <aside className="control-deck" aria-label="Game controls">
         <button
           className="direction-button"
-          onPointerDown={() => startWalking(-1)}
-          onPointerUp={() => finishWalkingInput(-1)}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || event.button !== 0) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            startWalking(-1);
+          }}
+          onPointerUp={(event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              finishWalkingInput(-1);
+              event.currentTarget.releasePointerCapture(event.pointerId);
+            }
+          }}
+          onClick={(event) => { if (event.detail === 0) travel(-1); }}
           onPointerCancel={stopWalking}
-          onPointerLeave={stopWalking}
+          onLostPointerCapture={() => { if (heldDirection.current !== null) stopWalking(); }}
           disabled={atLeftEdge}
-          aria-label="Hold to walk left."
+          aria-label="Previous section. Hold to walk left."
         >
           <ArrowLeft size={19} strokeWidth={3} />
         </button>
         <div className="control-copy">
           <span>WALK</span>
           <strong>← / A &nbsp;&nbsp; D / →</strong>
-          <small>DOUBLE CLICK A SIDE TO DASH · SWIPE OR SCROLL</small>
+          <small>HOLD TO WALK · DOUBLE TAP TO DASH · SCROLL TO READ</small>
         </div>
         <button
           className="direction-button"
-          onPointerDown={() => startWalking(1)}
-          onPointerUp={() => finishWalkingInput(1)}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || event.button !== 0) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            startWalking(1);
+          }}
+          onPointerUp={(event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              finishWalkingInput(1);
+              event.currentTarget.releasePointerCapture(event.pointerId);
+            }
+          }}
+          onClick={(event) => { if (event.detail === 0) travel(1); }}
           onPointerCancel={stopWalking}
-          onPointerLeave={stopWalking}
+          onLostPointerCapture={() => { if (heldDirection.current !== null) stopWalking(); }}
           disabled={atRightEdge}
-          aria-label="Hold to walk right."
+          aria-label="Next section. Hold to walk right."
         >
           <ArrowRight size={19} strokeWidth={3} />
         </button>
