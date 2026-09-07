@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  CheckCircle2,
   Code2,
   Database,
   Github,
@@ -42,6 +41,7 @@ type FloorTheme = {
 };
 
 type Project = {
+  media?: { src: string; alt: string; caption: string; width: number; height: number };
   number: string;
   eyebrow: string;
   title: string;
@@ -66,8 +66,15 @@ const projects: Project[] = [
     number: "01",
     eyebrow: "Independent product · shipped",
     title: "Renewables",
+    media: {
+      src: "/projects/renewables.webp",
+      alt: "Renewables home screen showing urgent items and upcoming expirations",
+      caption: "Renewables · Home and upcoming renewals",
+      width: 1080,
+      height: 1920,
+    },
     description:
-      "A life-admin tracker that keeps passports, warranties, subscriptions, and recurring responsibilities from slipping through the cracks.",
+      "Track document expirations, warranties, and subscriptions, with timely reminders across your devices.",
     impact: "Production Flutter product · mobile, web, widgets, and reminders",
     stack: ["Flutter", "Riverpod", "Supabase", "RevenueCat"],
     status: "Shipped product",
@@ -93,7 +100,7 @@ const projects: Project[] = [
     eyebrow: "In development · privacy-first mobile",
     title: "Selah",
     description:
-      "A quiet-time companion that guides people to pause, put the phone down, read a physical Bible, reflect, pray, and gradually need the app less.",
+      "A private devotional companion that guides you to pause, open a physical Bible, reflect, and pray.",
     impact: "Active development · encrypted, local-first, and intentionally private",
     stack: ["Flutter", "Drift", "Encrypted SQLite", "Riverpod"],
     status: "Active development",
@@ -116,7 +123,7 @@ const projects: Project[] = [
     eyebrow: "Full-stack coordination system",
     title: "IFGF Planner",
     description:
-      "An Indonesian-first volunteer scheduling system for church coordinators, with availability collection, guarded assignments, and LINE group delivery.",
+      "Plan church volunteer schedules, collect availability, and share assignments and reminders through LINE.",
     impact: "End-to-end workflow · scheduling, security, export, and group messaging",
     stack: ["Next.js", "Supabase", "LINE API", "Cloudflare"],
     status: "Active product",
@@ -142,7 +149,7 @@ const projects: Project[] = [
     eyebrow: "Professional system · distributed architecture",
     title: "DCIM Platform",
     description:
-      "A data-center infrastructure platform for device inventory, operating-system automation, monitoring, network controls, billing integration, and real-time operational updates.",
+      "Manage data-center devices, automate operating-system installation, and monitor operations with real-time updates.",
     impact: "Three data centers · 70+ devices in the initial prototype",
     stack: ["Flutter", "WebSockets", "Redis Pub/Sub", "PostgreSQL"],
     status: "Production system",
@@ -256,83 +263,74 @@ function ActionIcon({ action }: { action?: Project["externalAction"] }) {
   return <ArrowUpRight size={16} />;
 }
 
+function ProjectMedia({ project }: { project: Project }) {
+  if (!project.media) return null;
+  const media = project.media;
+  return (
+    <figure className="project-media">
+      <a className="project-media-link" href={media.src} target="_blank" rel="noreferrer"
+        aria-label={`Open full-size ${project.title} screenshot`}>
+        <img src={media.src} alt={media.alt} width={media.width} height={media.height} loading="lazy" />
+        <span className="media-zoom">View full size <ArrowUpRight size={16} /></span>
+      </a>
+      <figcaption>{media.caption}</figcaption>
+    </figure>
+  );
+}
+
+function ProjectDetails({ project }: { project: Project }) {
+  return (
+    <details className="project-details">
+      <summary>Role &amp; engineering details</summary>
+      <dl>
+        <div><dt>My role</dt><dd>{project.role}</dd></div>
+        <div><dt>The problem</dt><dd>{project.problem}</dd></div>
+        <div><dt>Key decisions</dt><dd><ul>{project.decisions.map((decision) => <li key={decision}>{decision}</li>)}</ul></dd></div>
+        <div><dt>Outcome</dt><dd>{project.outcome}</dd></div>
+      </dl>
+    </details>
+  );
+}
+
 function ProjectScene({
   project,
-  index,
   sceneStyle,
   phase,
   onOpenCaseStudy,
 }: {
   project: Project;
-  index: number;
   sceneStyle: CSSProperties;
   phase: ScenePhase;
   onOpenCaseStudy: (project: Project) => void;
 }) {
   const projectId = slugify(project.title);
-
   return (
-    <section
-      id={projectId}
-      className={`game-scene project-scene ${project.sceneClass}`}
-      data-scene-phase={phase}
-      aria-labelledby={`${projectId}-title`}
-      aria-hidden={phase !== "visible"}
-      inert={phase !== "visible"}
-      style={{ ...sceneStyle, "--project-accent": project.accent } as CSSProperties}
-    >
-      <div className="pixel-sky-detail">
-        <span className="pixel-cloud cloud-a" />
-        <span className="pixel-cloud cloud-b" />
-      </div>
-
+    <section id={projectId} className={`game-scene project-scene ${project.sceneClass}`}
+      data-scene-phase={phase} aria-labelledby={`${projectId}-title`}
+      aria-hidden={phase !== "visible"} inert={phase !== "visible"}
+      style={{ ...sceneStyle, "--project-accent": project.accent } as CSSProperties}>
       <article className="scene-panel project-panel panel-scroll" tabIndex={0}>
-        <div className="panel-index">
-          <span>PROJECT LOG</span>
-          <strong>{project.number}/04</strong>
-        </div>
-        <div className="project-heading-row">
-          <p className="scene-eyebrow">{project.eyebrow}</p>
-          <span className="project-status">{project.status}</span>
-        </div>
-        <h2 id={`${projectId}-title`}>{project.title}</h2>
-        <p className="project-description">{project.description}</p>
-        <p className="impact-line">
-          <span aria-hidden="true">◆</span>
-          {project.impact}
-        </p>
-        <p className="project-role"><strong>MY ROLE</strong>{project.role}</p>
-        <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
-          {project.stack.map((technology) => (
-            <li key={technology}>{technology}</li>
-          ))}
-        </ul>
-        <div className="project-actions">
-          <button className="pixel-action" onClick={() => onOpenCaseStudy(project)}>
-            OPEN CASE STUDY <ArrowUpRight size={14} />
-          </button>
-          {project.externalHref && (
-            <a
-              className="text-action"
-              href={project.externalHref}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ActionIcon action={project.externalAction} />
-              {project.externalLabel}
-            </a>
-          )}
+        <div className="panel-index"><span>SELECTED WORK</span><strong>{project.number}/04</strong></div>
+        <div className={`project-sheet ${project.media ? "has-media" : ""}`}>
+          <div className="project-information">
+            <span className="project-status">{project.status}</span>
+            <h2 id={`${projectId}-title`}>{project.title}</h2>
+            <p className="project-description">{project.description}</p>
+            <p className="impact-line">{project.impact}</p>
+            <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
+              {project.stack.map((technology) => <li key={technology}>{technology}</li>)}
+            </ul>
+            <div className="project-actions">
+              {project.externalHref && <a className="pixel-action" href={project.externalHref} target="_blank" rel="noreferrer">
+                <ActionIcon action={project.externalAction} />{project.externalLabel}
+              </a>}
+              <button className="text-action" onClick={() => onOpenCaseStudy(project)}>Case study <ArrowUpRight size={16} /></button>
+            </div>
+            <ProjectDetails project={project} />
+          </div>
+          <ProjectMedia project={project} />
         </div>
       </article>
-
-      <div className="project-beacon" aria-hidden="true">
-        <span>{project.number}</span>
-        <i />
-      </div>
-      <div className={`world-prop project-prop prop-${index}`} aria-hidden="true">
-        <span />
-        <i />
-      </div>
     </section>
   );
 }
@@ -504,45 +502,22 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
                   <p>{project.eyebrow}</p>
                   <strong>{project.status}</strong>
                 </div>
-                <div className="case-study-intro">
-                  <div>
+                <div className={`project-sheet ${project.media ? "has-media" : ""}`}>
+                  <div className="project-information">
                     <h3>{project.title}</h3>
-                    <p>{project.description}</p>
+                    <p className="project-description">{project.description}</p>
+                    <p className="impact-line">{project.impact}</p>
+                    <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
+                      {project.stack.map((technology) => <li key={technology}>{technology}</li>)}
+                    </ul>
+                    {project.externalHref && <div className="project-actions">
+                      <a className="quick-button primary" href={project.externalHref} target="_blank" rel="noreferrer">
+                        <ActionIcon action={project.externalAction} />{project.externalLabel}
+                      </a>
+                    </div>}
+                    <ProjectDetails project={project} />
                   </div>
-                  <ul aria-label={`${project.title} technology stack`}>
-                    {project.stack.map((technology) => <li key={technology}>{technology}</li>)}
-                  </ul>
-                </div>
-                <div className="case-study-grid">
-                  <div><span>PROBLEM</span><p>{project.problem}</p></div>
-                  <div><span>MY ROLE</span><p>{project.role}</p></div>
-                  <div className="decision-card">
-                    <span>KEY ENGINEERING DECISIONS</span>
-                    <ol>{project.decisions.map((decision) => <li key={decision}>{decision}</li>)}</ol>
-                  </div>
-                  <div><span>OUTCOME</span><p>{project.outcome}</p></div>
-                </div>
-                {project.title === "DCIM Platform" && (
-                  <div className="architecture-block">
-                    <div className="architecture-copy">
-                      <span>DECISION SPOTLIGHT</span>
-                      <h4>Responsive updates. Recoverable state.</h4>
-                      <p>The database owns state; the real-time layer only announces that state changed. Reconnection reconciles anything the client missed.</p>
-                    </div>
-                    <div className="architecture-flow" role="img" aria-label="DCIM update flow from Flutter clients through the API and PostgreSQL, then WebSockets and Redis Pub/Sub back to clients">
-                      <span>Flutter clients</span><i>write</i><span>API + PostgreSQL</span><i>notify</i><span>WebSocket gateway</span><i>fan out</i><span>Redis Pub/Sub</span>
-                    </div>
-                  </div>
-                )}
-                <div className="case-study-footer">
-                  <ul>{project.proof.map((item) => <li key={item}><CheckCircle2 size={15} />{item}</li>)}</ul>
-                  {project.externalHref ? (
-                    <a href={project.externalHref} target="_blank" rel="noreferrer">
-                      <ActionIcon action={project.externalAction} /> {project.externalLabel} <ArrowUpRight size={14} />
-                    </a>
-                  ) : (
-                    <span className="private-code"><ShieldCheck size={15} /> Private or proprietary source</span>
-                  )}
+                  <ProjectMedia project={project} />
                 </div>
               </article>
             ))}
@@ -1453,7 +1428,6 @@ export default function Home() {
           <ProjectScene
             key={project.title}
             project={project}
-            index={index}
             sceneStyle={sceneStyle(index + 2)}
             phase={scenePhases[index + 2]}
             onOpenCaseStudy={openCaseStudy}
