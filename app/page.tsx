@@ -41,6 +41,8 @@ type FloorTheme = {
 };
 
 type Project = {
+  subtitle?: string;
+  demo?: { href: string; label: string; description: string; logo?: string };
   media?: { src: string; alt: string; caption: string; width: number; height: number };
   number: string;
   eyebrow: string;
@@ -99,6 +101,7 @@ const projects: Project[] = [
     number: "02",
     eyebrow: "In development · privacy-first mobile",
     title: "Selah",
+    demo: { href: "http://selah.cubelated.com/", label: "Open Selah demo", description: "Explore Selah, a guided companion for devotional time.", logo: "/projects/selah.webp" },
     description:
       "A private devotional companion that guides you to pause, open a physical Bible, reflect, and pray.",
     impact: "Active development · encrypted, local-first, and intentionally private",
@@ -121,7 +124,9 @@ const projects: Project[] = [
   {
     number: "03",
     eyebrow: "Full-stack coordination system",
-    title: "IFGF Planner",
+    title: "Church Planner",
+    subtitle: "Organizational Scheduling and Dashboard",
+    demo: { href: "https://planner.ifgftaichung.dpdns.org/", label: "Open Church Planner", description: "Explore the organizational scheduling and dashboard application. Sign-in may be required.", logo: "/projects/church-planner.png" },
     description:
       "Plan church volunteer schedules, collect availability, and share assignments and reminders through LINE.",
     impact: "End-to-end workflow · scheduling, security, export, and group messaging",
@@ -148,6 +153,7 @@ const projects: Project[] = [
     number: "04",
     eyebrow: "Professional system · distributed architecture",
     title: "DCIM Platform",
+    demo: { href: "https://hostinginside.com/", label: "Visit HostingInside", description: "Company reference only. Product screens and operational data are confidential." },
     description:
       "Manage data-center devices, automate operating-system installation, and monitor operations with real-time updates.",
     impact: "Three data centers · 70+ devices in the initial prototype",
@@ -183,7 +189,7 @@ const sceneNames = [
   "Mission",
   "Renewables",
   "Selah",
-  "IFGF Planner",
+  "Church Planner",
   "DCIM Platform",
   "HostingInside",
   "Feng Chia University",
@@ -214,14 +220,14 @@ const SECTION_ACTIVE_RADIUS = 0.4;
 const SCENE_FADE_MS = 620;
 const CHAPTER_TOAST_MS = 3200;
 const scenePosition = (scene: number) => scene * SECTION_SPACING;
-const slugify = (value: string) => value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(^-|-$)/g, "");
+const slugify = (value: string) => (value === "Church Planner" ? "ifgf-planner" : value).toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(^-|-$)/g, "");
 
 const characterSprites = [
-  { state: "idle", src: "/knight/idle-breathing-south.gif" },
-  { state: "walk-south-east", src: "/knight/walking-south-east.gif" },
-  { state: "walk-south-west", src: "/knight/walking-south-west.gif" },
-  { state: "dash-south-east", src: "/knight/dash-south-east.png" },
-  { state: "dash-south-west", src: "/knight/dash-south-west.png" },
+  { state: "idle", src: "/knight/idle-v3.gif" },
+  { state: "walk-south-east", src: "/knight/walk-v3-south-east.gif" },
+  { state: "walk-south-west", src: "/knight/walk-v3-south-west.gif" },
+  { state: "dash-south-east", src: "/knight/dash-v3-south-east.png" },
+  { state: "dash-south-west", src: "/knight/dash-v3-south-west.png" },
 ];
 
 const PixelCharacter = memo(function PixelCharacter({
@@ -264,7 +270,17 @@ function ActionIcon({ action }: { action?: Project["externalAction"] }) {
 }
 
 function ProjectMedia({ project }: { project: Project }) {
-  if (!project.media) return null;
+  if (!project.media) {
+    if (!project.demo) return null;
+    const demo = project.demo;
+    return <aside className="project-media project-demo" aria-label={`${project.title} reference`}>
+      {demo.logo ? <img className="project-demo-logo" src={demo.logo} alt={`${project.title} logo`} width={160} height={160} loading="lazy" /> : <Database size={48} aria-hidden="true" />}
+      <p className="demo-kind">{project.title === "DCIM Platform" ? "COMPANY REFERENCE" : "LIVE APPLICATION"}</p>
+      <h3>{project.title === "DCIM Platform" ? "HostingInside" : project.title}</h3>
+      <p>{demo.description}</p>
+      <a className="quick-button primary" href={demo.href} target="_blank" rel="noreferrer">{demo.label}<ArrowUpRight size={16} /></a>
+    </aside>;
+  }
   const media = project.media;
   return (
     <figure className="project-media">
@@ -311,10 +327,11 @@ function ProjectScene({
       style={{ ...sceneStyle, "--project-accent": project.accent } as CSSProperties}>
       <article className="scene-panel project-panel panel-scroll" tabIndex={0}>
         <div className="panel-index"><span>SELECTED WORK</span><strong>{project.number}/04</strong></div>
-        <div className={`project-sheet ${project.media ? "has-media" : ""}`}>
+        <div className={`project-sheet ${(project.media || project.demo) ? "has-media" : ""}`}>
           <div className="project-information">
             <span className="project-status">{project.status}</span>
             <h2 id={`${projectId}-title`}>{project.title}</h2>
+            {project.subtitle && <p className="project-subtitle">{project.subtitle}</p>}
             <p className="project-description">{project.description}</p>
             <p className="impact-line">{project.impact}</p>
             <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
@@ -383,14 +400,14 @@ const expertiseAreas = [
     title: "Backend & Distributed Systems",
     summary: "Reliable state, event delivery, recovery paths, and security boundaries.",
     skills: ["PostgreSQL", "Supabase", "WebSockets", "Redis Pub/Sub", "Edge Functions", "RLS"],
-    evidence: ["DCIM Platform", "Renewables", "IFGF Planner"],
+    evidence: ["DCIM Platform", "Renewables", "Church Planner"],
   },
   {
     icon: "infra",
     title: "Web & Infrastructure",
     summary: "Web applications and infrastructure built for deployment, maintenance, and growth.",
     skills: ["React", "Next.js", "Cloudflare", "Docker", "Linux", "Network troubleshooting", "CI/CD"],
-    evidence: ["IFGF Planner", "HostingInside platforms", "VirtualClass"],
+    evidence: ["Church Planner", "HostingInside platforms", "VirtualClass"],
   },
   {
     icon: "leadership",
@@ -502,9 +519,10 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
                   <p>{project.eyebrow}</p>
                   <strong>{project.status}</strong>
                 </div>
-                <div className={`project-sheet ${project.media ? "has-media" : ""}`}>
+                <div className={`project-sheet ${(project.media || project.demo) ? "has-media" : ""}`}>
                   <div className="project-information">
                     <h3>{project.title}</h3>
+                    {project.subtitle && <p className="project-subtitle">{project.subtitle}</p>}
                     <p className="project-description">{project.description}</p>
                     <p className="impact-line">{project.impact}</p>
                     <ul className="pixel-tags" aria-label={`${project.title} technologies`}>
@@ -593,7 +611,7 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
           <div className="notes-grid">
             <article><Code2 /><span>REAL-TIME SYSTEMS</span><h3>Keep state recoverable.</h3><p>WebSockets make change visible quickly; PostgreSQL makes it recoverable. That distinction shaped reconnection and synchronization.</p></article>
             <article><ShieldCheck /><span>PRIVACY</span><h3>Design privacy into the product.</h3><p>Selah keeps sensitive journals local, encrypts storage, and gives the user an explicit encrypted export instead of silent cloud collection.</p></article>
-            <article><Globe2 /><span>PUBLIC WORKFLOWS</span><h3>Validate every shared link.</h3><p>IFGF Planner hashes share tokens, validates them server-side, and keeps privileged database operations away from anonymous browsers.</p></article>
+            <article><Globe2 /><span>PUBLIC WORKFLOWS</span><h3>Validate every shared link.</h3><p>Church Planner hashes share tokens, validates them server-side, and keeps privileged database operations away from anonymous browsers.</p></article>
           </div>
         </section>
 
@@ -770,7 +788,7 @@ export default function Home() {
         window.history.replaceState(
           null,
           "",
-          `#${sceneNames[targetScene].toLowerCase().replaceAll(" ", "-")}`,
+          `#${slugify(sceneNames[targetScene])}`,
         );
       };
 
@@ -939,7 +957,7 @@ export default function Home() {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const initialScene = sceneNames.findIndex(
-      (name) => name.toLowerCase().replaceAll(" ", "-") === hash,
+      (name) => slugify(name) === hash,
     );
     const initialPosition =
       initialScene > 0 ? scenePosition(initialScene) : positionRef.current;

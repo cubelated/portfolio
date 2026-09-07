@@ -50,3 +50,13 @@ test('reading view exposes every case study and its navigation destinations', ()
   assert.match(html, /BUILD WITH PURPOSE/);
   assert.match(html, /ENGINEERING EXPERTISE/);
 });
+
+test('project references use supplied destinations and preserve existing Church Planner links', () => {
+  const html = renderToStaticMarkup(createElement(QuickPortfolio, { onExplore() {} }));
+  for (const href of ['http://selah.cubelated.com/', 'https://planner.ifgftaichung.dpdns.org/', 'https://github.com/cubelated/ifgf-planner', 'https://hostinginside.com/']) {
+    assert.ok(html.includes(`href="${href}"`), href);
+  }
+  assert.match(html, /Organizational Scheduling and Dashboard/);
+  assert.match(html, /Company reference only/);
+  assert.match(html, /id="case-ifgf-planner"/);
+});
