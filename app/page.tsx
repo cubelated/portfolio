@@ -217,7 +217,7 @@ const QUICK_PRESS_MS = 230;
 const DOUBLE_RELEASE_MS = 380;
 const SECTION_SPACING = 1.12;
 const SECTION_ACTIVE_RADIUS = 0.4;
-const SCENE_FADE_MS = 620;
+const SCENE_FADE_MS = 380;
 const CHAPTER_TOAST_MS = 3200;
 const scenePosition = (scene: number) => scene * SECTION_SPACING;
 const slugify = (value: string) => (value === "Church Planner" ? "ifgf-planner" : value).toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(^-|-$)/g, "");
@@ -1161,7 +1161,7 @@ export default function Home() {
     (scene: number) => {
       const offset = scenePosition(scene) - position;
       return {
-        "--scene-offset": clamp(offset, -1, 1),
+        "--scene-offset": offset,
       } as CSSProperties;
     },
     [position],
