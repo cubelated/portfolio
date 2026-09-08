@@ -446,7 +446,7 @@ a {
   --scene-visibility: 0;
   --scene-offset: 0;
   --scene-tint: transparent;
-  --scene-fade-duration: 620ms;
+  --scene-fade-duration: 380ms;
   --scene-fade-easing: cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
 }
@@ -3618,7 +3618,6 @@ button:focus-visible, a:focus-visible {
   .scene-panel { width: calc(100% - 2rem); left: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .game-scene { --scene-fade-duration: 0ms; }
   .parallax-layer { transform: none; }
   .dash-trail, .dust { display: none; }
 }
@@ -3720,5 +3719,24 @@ button:focus-visible, a:focus-visible {
 }
 @media (max-height: 600px) {
   .character-stage { width: 44px; height: 44px; }
+  .game-shell { --stage-space: 6rem; }
+}
+
+/* Keep reading panels on screen for the full enter/exit opacity transition. */
+.game-scene { overflow: visible; pointer-events: none; }
+.game-scene > .scene-panel {
+  transform: translateX(calc(var(--scene-offset) * -100vw));
+  transition: opacity var(--scene-fade-duration) var(--scene-fade-easing);
+}
+.game-scene[data-scene-phase="hidden"] > .scene-panel,
+.game-scene[data-scene-phase="exiting"] > .scene-panel { opacity: 0; pointer-events: none; }
+.character-stage { width: 84px; height: 84px; }
+.game-shell { --stage-space: 11rem; }
+@media (max-width: 760px) {
+  .character-stage { width: 72px; height: 72px; }
+  .game-shell { --stage-space: 10.5rem; }
+}
+@media (max-height: 600px) {
+  .character-stage { width: 60px; height: 60px; }
   .game-shell { --stage-space: 6rem; }
 }
