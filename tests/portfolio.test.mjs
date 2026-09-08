@@ -32,7 +32,7 @@ test('GIF character never inherits the obsolete alternating-opacity animation', 
   const css = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
   assert.doesNotMatch(css, /knight-stride|knight-sprite-primary|knight-sprite-alternate/);
   assert.match(css, /\.knight-sprite\s*\{\s*animation: none; transition: none;/);
-  assert.match(css, /\.knight-sprite-animated\s*\{ visibility: hidden !important;/);
+  assert.doesNotMatch(css, /\.knight-sprite-animated\s*\{ visibility: hidden !important;/);
 });
 
 test('every exploration section has a focusable reading panel and hidden scenes are inert', () => {
@@ -59,4 +59,12 @@ test('project references use supplied destinations and preserve existing Church 
   assert.match(html, /Organizational Scheduling and Dashboard/);
   assert.match(html, /Company reference only/);
   assert.match(html, /id="case-ifgf-planner"/);
+});
+
+
+test('project website previews are embedded beside the information', () => {
+  const html = renderToStaticMarkup(createElement(QuickPortfolio, { onExplore() {} }));
+  assert.equal((html.match(/<iframe /g) ?? []).length, 3);
+  assert.match(html, /HostingInside company website preview/);
+  assert.match(html, /src="https:\/\/selah.cubelated.com\/"/);
 });

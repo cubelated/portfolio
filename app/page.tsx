@@ -42,7 +42,7 @@ type FloorTheme = {
 
 type Project = {
   subtitle?: string;
-  demo?: { href: string; label: string; description: string; logo?: string };
+  demo?: { href: string; label: string; description: string; logo?: string; previewHref?: string };
   media?: { src: string; alt: string; caption: string; width: number; height: number };
   number: string;
   eyebrow: string;
@@ -101,7 +101,7 @@ const projects: Project[] = [
     number: "02",
     eyebrow: "In development · privacy-first mobile",
     title: "Selah",
-    demo: { href: "http://selah.cubelated.com/", label: "Open Selah demo", description: "Explore Selah, a guided companion for devotional time.", logo: "/projects/selah.webp" },
+    demo: { previewHref: "https://selah.cubelated.com/", href: "http://selah.cubelated.com/", label: "Open Selah demo", description: "Explore Selah, a guided companion for devotional time.", logo: "/projects/selah.webp" },
     description:
       "A private devotional companion that guides you to pause, open a physical Bible, reflect, and pray.",
     impact: "Active development · encrypted, local-first, and intentionally private",
@@ -126,7 +126,7 @@ const projects: Project[] = [
     eyebrow: "Full-stack coordination system",
     title: "Church Planner",
     subtitle: "Organizational Scheduling and Dashboard",
-    demo: { href: "https://planner.ifgftaichung.dpdns.org/", label: "Open Church Planner", description: "Explore the organizational scheduling and dashboard application. Sign-in may be required.", logo: "/projects/church-planner.png" },
+    demo: { previewHref: "https://planner.ifgftaichung.dpdns.org/", href: "https://planner.ifgftaichung.dpdns.org/", label: "Open Church Planner", description: "Explore the organizational scheduling and dashboard application. Sign-in may be required.", logo: "/projects/church-planner.png" },
     description:
       "Plan church volunteer schedules, collect availability, and share assignments and reminders through LINE.",
     impact: "End-to-end workflow · scheduling, security, export, and group messaging",
@@ -153,7 +153,7 @@ const projects: Project[] = [
     number: "04",
     eyebrow: "Professional system · distributed architecture",
     title: "DCIM Platform",
-    demo: { href: "https://hostinginside.com/", label: "Visit HostingInside", description: "Company reference only. Product screens and operational data are confidential." },
+    demo: { previewHref: "https://hostinginside.com/", href: "https://hostinginside.com/", label: "Visit HostingInside", description: "Company reference only. Product screens and operational data are confidential." },
     description:
       "Manage data-center devices, automate operating-system installation, and monitor operations with real-time updates.",
     impact: "Three data centers · 70+ devices in the initial prototype",
@@ -215,7 +215,7 @@ const clamp = (value: number, min: number, max: number) =>
 
 const QUICK_PRESS_MS = 230;
 const DOUBLE_RELEASE_MS = 380;
-const SECTION_SPACING = 1.48;
+const SECTION_SPACING = 1.12;
 const SECTION_ACTIVE_RADIUS = 0.4;
 const SCENE_FADE_MS = 620;
 const CHAPTER_TOAST_MS = 3200;
@@ -238,6 +238,15 @@ const PixelCharacter = memo(function PixelCharacter({
   mode: MotionMode;
 }) {
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
+  const spriteElements = useRef(new Map<string, HTMLImageElement>());
+  useEffect(() => {
+    // Cached images may finish before hydration attaches onLoad.
+    const ready: Record<string, boolean> = {};
+    spriteElements.current.forEach((image, state) => {
+      ready[state] = image.complete && image.naturalWidth > 0;
+    });
+    setLoaded(ready);
+  }, []);
   const state = mode === "idle" ? "idle" : `${mode}-${direction === -1 ? "south-west" : "south-east"}`;
   const ready = loaded[state] === true;
 
@@ -251,6 +260,7 @@ const PixelCharacter = memo(function PixelCharacter({
           data-active={!ready} alt="" width={128} height={128} draggable={false} />
         {characterSprites.map((sprite) => (
           <img key={sprite.state} className="knight-sprite knight-sprite-animated"
+            ref={(element) => { if (element) spriteElements.current.set(sprite.state, element); else spriteElements.current.delete(sprite.state); }}
             src={sprite.src} data-active={ready && state === sprite.state}
             onLoad={() => setLoaded((current) => ({ ...current, [sprite.state]: true }))}
             onError={() => setLoaded((current) => ({ ...current, [sprite.state]: false }))}
@@ -274,10 +284,14 @@ function ProjectMedia({ project }: { project: Project }) {
     if (!project.demo) return null;
     const demo = project.demo;
     return <aside className="project-media project-demo" aria-label={`${project.title} reference`}>
-      {demo.logo ? <img className="project-demo-logo" src={demo.logo} alt={`${project.title} logo`} width={160} height={160} loading="lazy" /> : <Database size={48} aria-hidden="true" />}
+      {demo.previewHref && <div className="website-preview">
+        <iframe src={demo.previewHref} title={`${project.title === "DCIM Platform" ? "HostingInside company website" : project.title} preview`}
+          loading="lazy" referrerPolicy="no-referrer" sandbox="allow-scripts allow-same-origin" />
+      </div>}
       <p className="demo-kind">{project.title === "DCIM Platform" ? "COMPANY REFERENCE" : "LIVE APPLICATION"}</p>
       <h3>{project.title === "DCIM Platform" ? "HostingInside" : project.title}</h3>
       <p>{demo.description}</p>
+      <small>Preview unavailable? Open the website below.</small>
       <a className="quick-button primary" href={demo.href} target="_blank" rel="noreferrer">{demo.label}<ArrowUpRight size={16} /></a>
     </aside>;
   }
@@ -839,7 +853,7 @@ export default function Home() {
         const elapsedSeconds = Math.min((now - previousTime) / 1000, 0.05);
         previousTime = now;
         const nextPosition = clamp(
-          positionRef.current + heldDirection.current * elapsedSeconds * 0.72,
+          positionRef.current + heldDirection.current * elapsedSeconds * 1.05,
           0,
           maxPosition,
         );
