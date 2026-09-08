@@ -3740,3 +3740,44 @@ button:focus-visible, a:focus-visible {
   .character-stage { width: 60px; height: 60px; }
   .game-shell { --stage-space: 6rem; }
 }
+
+/* World-local panels: discover a section by approaching its center. */
+.game-scene { overflow: hidden; }
+.game-scene > .scene-panel {
+  transform: translateY(10px);
+  transition: opacity var(--scene-fade-duration) ease, transform var(--scene-fade-duration) ease;
+}
+.game-scene[data-scene-phase="entering"] > .scene-panel,
+.game-scene[data-scene-phase="visible"] > .scene-panel { transform: translateY(0); }
+.character-stage { width: 96px; height: 96px; }
+.adventure-objects { position: absolute; inset: 0; pointer-events: none; z-index: 55; }
+.world-object {
+  position: absolute; bottom: calc(5rem + env(safe-area-inset-bottom)); width: 96px; height: 96px;
+  transform: translateX(-50%); border: 0; padding: 0; background-color: transparent;
+  background-image: url('/knight/destructible-objects.png'); background-size: 672px 1152px;
+  background-repeat: no-repeat; image-rendering: pixelated; pointer-events: auto; cursor: pointer;
+}
+.world-object:disabled { cursor: default; }
+.world-object:focus-visible { outline: 2px dashed var(--yellow); outline-offset: -12px; }
+.attack-button {
+  position: absolute; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 115;
+  min-height: 48px; padding: 0.6rem 1rem; border: 2px solid var(--cream); border-radius: 4px;
+  background: #382a45; color: var(--cream); cursor: pointer; font-size: 0.875rem;
+}
+.attack-button span { display: block; font-size: 0.75rem; }
+.attack-button:disabled { opacity: 0.6; cursor: default; }
+.adventure-status { position: absolute; bottom: 0.2rem; left: 1rem; z-index: 115; font-size: 0.75rem; color: var(--cream); pointer-events: none; }
+@media (max-width: 760px) {
+  .character-stage { width: 84px; height: 84px; }
+  .control-deck { left: 0.5rem; transform: none; max-width: calc(100% - 6.5rem); padding: 0.4rem; gap: 0.4rem; }
+  .control-copy strong { font-size: 0.75rem; }
+  .control-copy small { display: none; }
+  .attack-button { right: 0.5rem; padding: 0.4rem; width: 5rem; }
+  .attack-button span { display: none; }
+  .adventure-status { left: 0.5rem; }
+}
+@media (max-height: 600px) {
+  .character-stage { width: 68px; height: 68px; left: 50%; right: auto; transform: translateX(-50%); bottom: 5rem; }
+  .world-object { bottom: 4.5rem; }
+  .game-shell { --stage-space: 9rem; min-height: 28rem; }
+}

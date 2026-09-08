@@ -7,10 +7,10 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 // Exercise the real components without adding a browser or test-only production exports.
 const page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
-const compiled = ts.transpileModule(`${page}\nexport { PixelCharacter, QuickPortfolio };`, {
+const compiled = ts.transpileModule(`${page}\nexport { PixelCharacter, QuickPortfolio, worldObjects };`, {
   compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText.replace(/from "([^"]+)"/g, (_, name) => `from "${import.meta.resolve(name)}"`);
-const { default: Home, PixelCharacter, QuickPortfolio } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { default: Home, PixelCharacter, QuickPortfolio, worldObjects } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 
 test('all character assets remain mounted across idle, walking, dash and direction changes', () => {
   let expected;
@@ -67,4 +67,16 @@ test('project website previews are embedded beside the information', () => {
   assert.equal((html.match(/<iframe /g) ?? []).length, 3);
   assert.match(html, /HostingInside company website preview/);
   assert.match(html, /src="https:\/\/selah.cubelated.com\/"/);
+});
+
+
+test('destructible objects cover every section and use valid destruction rows', () => {
+  assert.equal(worldObjects.length, 20);
+  assert.equal(new Set(worldObjects.map((item) => item.id)).size, 20);
+  for (const item of worldObjects) {
+    assert.ok(item.position >= 0 && item.position <= 9 * 1.12);
+    assert.ok([1, 3, 5, 7, 9].includes(item.row));
+    assert.ok(item.variant >= 0 && item.variant <= 2);
+    assert.ok(item.frames + 2 <= 6);
+  }
 });
