@@ -216,7 +216,7 @@ const clamp = (value: number, min: number, max: number) =>
 const QUICK_PRESS_MS = 230;
 const DOUBLE_RELEASE_MS = 380;
 const SECTION_SPACING = 1.12;
-const SECTION_ACTIVE_RADIUS = 0.4;
+const SECTION_ACTIVE_RADIUS = 0.26;
 const SCENE_FADE_MS = 380;
 const CHAPTER_TOAST_MS = 3200;
 const scenePosition = (scene: number) => scene * SECTION_SPACING;
@@ -226,16 +226,18 @@ const characterSprites = [
   { state: "idle", src: "/knight/idle-v3.gif" },
   { state: "walk-south-east", src: "/knight/walk-v3-south-east.gif" },
   { state: "walk-south-west", src: "/knight/walk-v3-south-west.gif" },
-  { state: "dash-south-east", src: "/knight/dash-v3-south-east.png" },
-  { state: "dash-south-west", src: "/knight/dash-v3-south-west.png" },
+  { state: "dash-south-east", src: "/knight/slide-south-east.gif" },
+  { state: "dash-south-west", src: "/knight/slide-south-west.gif" },
 ];
 
 const PixelCharacter = memo(function PixelCharacter({
   direction,
   mode,
+  attack,
 }: {
   direction: TravelDirection;
   mode: MotionMode;
+  attack?: { direction: TravelDirection; src: string } | null;
 }) {
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
   const spriteElements = useRef(new Map<string, HTMLImageElement>());
@@ -251,21 +253,22 @@ const PixelCharacter = memo(function PixelCharacter({
   const ready = loaded[state] === true;
 
   return (
-    <div className="character-stage" data-direction={direction} data-motion={mode} aria-hidden="true">
+    <div className="character-stage" data-direction={attack?.direction ?? direction} data-motion={attack ? "attack" : mode} aria-hidden="true">
       <div className="dash-trail trail-one" />
       <div className="dash-trail trail-two" />
       <div className="knight-shadow" />
       <div className="knight-sprite-wrap">
         <img className="knight-sprite knight-sprite-fallback" src="/knight/idle-south.png"
-          data-active={!ready} alt="" width={128} height={128} draggable={false} />
+          data-active={!attack && !ready} alt="" width={128} height={128} draggable={false} />
         {characterSprites.map((sprite) => (
           <img key={sprite.state} className="knight-sprite knight-sprite-animated"
             ref={(element) => { if (element) spriteElements.current.set(sprite.state, element); else spriteElements.current.delete(sprite.state); }}
-            src={sprite.src} data-active={ready && state === sprite.state}
+            src={sprite.src} data-active={!attack && ready && state === sprite.state}
             onLoad={() => setLoaded((current) => ({ ...current, [sprite.state]: true }))}
             onError={() => setLoaded((current) => ({ ...current, [sprite.state]: false }))}
             alt="" width={128} height={128} loading="eager" draggable={false} />
         ))}
+        {attack && <img className="knight-sprite" src={attack.src} data-active="true" alt="" width={60} height={60} draggable={false} />}
       </div>
       <div className="dust dust-one" />
       <div className="dust dust-two" />
@@ -657,6 +660,128 @@ function QuickPortfolio({ onExplore }: { onExplore: () => void }) {
   );
 }
 
+type WorldObject = { id: number; position: number; row: number; variant: number; frames: number; label: string };
+// Seeded placement is stable during SSR, hydration and movement renders.
+const worldObjects: WorldObject[] = sceneNames.flatMap((_, scene) => {
+  const kinds = ["barrel", "crate", "sack", "sign", "signpost"];
+  return [-0.18, 0.22].map((offset, side) => {
+    const seed = ((scene + 1) * 16807 + side * 48271) >>> 0;
+    const kind = seed % kinds.length;
+    return { id: scene * 2 + side, position: clamp(scenePosition(scene) + offset + (seed % 5) * 0.012, 0, scenePosition(sceneNames.length - 1)),
+      row: kind * 2 + 1, variant: seed % 3, frames: kind < 3 ? 4 : 3, label: kinds[kind] };
+  });
+});
+
+function AdventureObjects({ position, onAttack, onStop }: {
+  position: number;
+  onAttack: (attack: { direction: TravelDirection; src: string } | null) => void;
+  onStop: () => void;
+}) {
+  const [frames, setFrames] = useState<Record<number, number>>({});
+  const [busy, setBusy] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const blobs = useRef<Blob[]>([]);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const attackUrl = useRef<string | null>(null);
+  const attacking = useRef(false);
+  const positionRef = useRef(position);
+  positionRef.current = position;
+  const destroyed = useRef(new Set<number>());
+  const onAttackRef = useRef(onAttack);
+  onAttackRef.current = onAttack;
+  const clearAttack = useCallback(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    // Finish debris frames even if walking or switching tabs interrupts a swing.
+    setFrames((current) => {
+      const next = { ...current };
+      worldObjects.forEach((object) => { if (destroyed.current.has(object.id)) next[object.id] = object.frames + 2; });
+      return next;
+    });
+    if (attackUrl.current) URL.revokeObjectURL(attackUrl.current);
+    attackUrl.current = null;
+    attacking.current = false;
+    setBusy(false);
+    onAttackRef.current(null);
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all(["south-west", "south-east"].map(async (direction) => {
+      const response = await fetch(`/knight/attack-${direction}.gif`, { signal: controller.signal });
+      if (!response.ok) throw new Error("Attack animation unavailable");
+      return response.blob();
+    })).then((result) => { if (!controller.signal.aborted) { blobs.current = result; setReady(true); } })
+      .catch(() => { if (!controller.signal.aborted) setAnnouncement("Attack animation could not load. Reload to try again."); });
+    return () => {
+      controller.abort();
+      timers.current.forEach(clearTimeout);
+      if (attackUrl.current) URL.revokeObjectURL(attackUrl.current);
+      onAttackRef.current(null);
+    };
+  }, []);
+  useEffect(() => {
+    if (attacking.current) clearAttack();
+  }, [position, clearAttack]);
+  useEffect(() => {
+    const stop = () => clearAttack();
+    const hidden = () => { if (document.hidden) stop(); };
+    window.addEventListener("blur", stop);
+    document.addEventListener("visibilitychange", hidden);
+    return () => { window.removeEventListener("blur", stop); document.removeEventListener("visibilitychange", hidden); };
+  }, [clearAttack]);
+
+  const attackObject = useCallback((object?: WorldObject) => {
+    if (!ready || attacking.current) return;
+    const target = object ?? worldObjects.filter((item) => !destroyed.current.has(item.id))
+      .sort((a, b) => Math.abs(a.position - positionRef.current) - Math.abs(b.position - positionRef.current))[0];
+    // Range is measured in pixels so touch and desktop both require approaching the object.
+    if (!target || Math.abs(target.position - positionRef.current) * window.innerWidth > 130 || destroyed.current.has(target.id)) {
+      setAnnouncement("Move closer to an object to attack it.");
+      return;
+    }
+    onStop();
+    attacking.current = true;
+    setBusy(true);
+    const direction: TravelDirection = target.position < positionRef.current ? -1 : 1;
+    // A fresh object URL restarts each GIF swing without fetching it again.
+    const src = URL.createObjectURL(blobs.current[direction === -1 ? 0 : 1]);
+    attackUrl.current = src;
+    onAttackRef.current({ direction, src });
+    timers.current.push(setTimeout(() => {
+      destroyed.current.add(target.id);
+      setAnnouncement(`${target.label} destroyed`);
+      for (let frame = 0; frame < target.frames; frame++) {
+        timers.current.push(setTimeout(() => setFrames((current) => ({ ...current, [target.id]: frame + 3 })), frame * 140));
+      }
+    }, 600));
+    timers.current.push(setTimeout(clearAttack, 1800));
+  }, [ready, onStop, clearAttack]);
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.target instanceof HTMLElement && event.target.closest("a, button, input, textarea, select, summary, [contenteditable], .scene-panel")) return;
+      if (event.code === "Space" || event.key.toLowerCase() === "e") { event.preventDefault(); attackObject(); }
+    };
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  }, [attackObject]);
+  return <>
+    <div className="adventure-objects" aria-label="World objects">
+      {worldObjects.map((object) => {
+        const offset = object.position - position;
+        if (Math.abs(offset) > 0.65) return null;
+        const frame = frames[object.id] ?? object.variant;
+        return <button key={object.id} className="world-object" disabled={!ready || busy || frames[object.id] !== undefined}
+          aria-label={`Attack ${object.label}`} onClick={() => attackObject(object)}
+          style={{ left: `calc(50% + ${offset * 100}vw)`, backgroundPosition: `${-frame * 96}px ${-object.row * 96}px` }} />;
+      })}
+    </div>
+    <button className="attack-button" onClick={() => attackObject()} disabled={!ready || busy}>⚔ Attack <span>E / Space</span></button>
+    <div className="adventure-status" role="status">{announcement || "Approach an object · E / Space to attack"}</div>
+  </>;
+}
+
 export default function Home() {
   const lastScene = sceneNames.length - 1;
   const maxPosition = scenePosition(lastScene);
@@ -664,6 +789,7 @@ export default function Home() {
   const [position, setPosition] = useState(0);
   const [direction, setDirection] = useState<TravelDirection>(1);
   const [motion, setMotion] = useState<MotionMode>("idle");
+  const [attack, setAttack] = useState<{ direction: TravelDirection; src: string } | null>(null);
   const [scenePhases, setScenePhases] = useState<ScenePhase[]>(() =>
     sceneNames.map((_, index) => (index === 0 ? "visible" : "hidden")),
   );
@@ -1649,7 +1775,8 @@ export default function Home() {
       </div>
 
       <PixelGround theme={floorThemes[nearestScene]} scene={nearestScene} />
-      <PixelCharacter direction={direction} mode={motion} />
+      <AdventureObjects position={position} onAttack={setAttack} onStop={stopWalking} />
+      <PixelCharacter direction={direction} mode={motion} attack={attack} />
 
       <aside className="control-deck" aria-label="Game controls">
         <button
